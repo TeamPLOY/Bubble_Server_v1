@@ -40,3 +40,5 @@ out/
 env/
 
 .DS_Store
+
+HELP.md
