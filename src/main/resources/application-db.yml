@@ -1,0 +1,16 @@
+spring:
+  config:
+    import:
+      - optional:file:env/spring.env[.properties]  # 'env/spring.env' 또는 'env/spring.env.properties' 파일을 불러옴
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    database: mysql  # JPA가 사용할 데이터베이스를 MySQL로 설정
+    hibernate:
+      ddl-auto: update  # Hibernate가 데이터베이스 스키마를 자동으로 업데이트하도록 설정
+    show-sql: true  # 실행되는 SQL 쿼리를 콘솔에 출력하도록 설정
