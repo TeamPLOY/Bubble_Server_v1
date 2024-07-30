@@ -1,9 +1,8 @@
-package com.laundering.launering_server.domain.member.model.entity;
+package com.laundering.launering_server.domain.reservation.model.entity;
 
+import com.laundering.launering_server.domain.member.model.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.io.Serializable;
 
 @Entity
 @Getter

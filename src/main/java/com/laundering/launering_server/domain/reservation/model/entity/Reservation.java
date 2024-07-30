@@ -1,4 +1,4 @@
-package com.laundering.launering_server.domain.member.model.entity;
+package com.laundering.launering_server.domain.reservation.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
