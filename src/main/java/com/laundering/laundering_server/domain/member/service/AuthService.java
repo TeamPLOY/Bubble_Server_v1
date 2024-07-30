@@ -49,14 +49,14 @@ public class AuthService
     }
 
     @Transactional
-    public TokenResponse publishToken(Member member)
+    public TokenResponse publishToken(User user)
     {
         TokenResponse tokenResponse = jwt.generateAllToken(
                 Jwt.Claims.from(
-                        member.getId()
+                        user.getId()
                 ));
 
-        member.setRefreshToken(tokenResponse.refreshToken());
+        user.setRefreshToken(tokenResponse.refreshToken());
 
         return tokenResponse;
     }
