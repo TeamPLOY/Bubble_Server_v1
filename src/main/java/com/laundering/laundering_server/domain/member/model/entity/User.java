@@ -15,6 +15,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId; // PK
 
+    private String socialAccountUid;
+
     private String refreshToken;
 
     @Enumerated(EnumType.STRING)

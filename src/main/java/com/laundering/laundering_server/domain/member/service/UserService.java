@@ -14,15 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
 
-    public User getBySocialAccount(SocialPlatformType socialPlatformType, String socialUid) {
-        return userRepository.findBySocialPlatformTypeAndSocialAccountUid(socialPlatformType, socialUid).orElse(null);
+    public User getBySocialAccount(String socialUid) {
+        return userRepository.findBySocialAccountUid(socialUid).orElse(null);
     }
 
     @Transactional
-    public User createBySocialAccount(SocialPlatformType socialPlatformType, String socialUid)
+    public User createBySocialAccount(String socialUid)
     {
         return userRepository.save(User.builder()
-                .socialPlatformType(socialPlatformType)
                 .socialAccountUid(socialUid)
                 .build()
         );

@@ -36,10 +36,10 @@ public class AuthService
         user.setRefreshToken(""); // setRefreshToken 메서드 호출
     }
 
-    public LoginResponse getLoginResponse(User member)
+    public LoginResponse getLoginResponse(User user)
     {
         var tokens = publishToken(user);
-        if (member.getEmail() == null || member.getEmail().isEmpty()) {
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
             return new LoginResponse(tokens, true); //isNewUser은 떄떄로 필요함
 
         }
@@ -53,7 +53,7 @@ public class AuthService
     {
         TokenResponse tokenResponse = jwt.generateAllToken(
                 Jwt.Claims.from(
-                        user.getId()
+                        user.getUserId()
                 ));
 
         user.setRefreshToken(tokenResponse.refreshToken());
