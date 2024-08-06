@@ -10,7 +10,6 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Reservation_User")
 public class ReservationUser {
 
     @EmbeddedId
@@ -26,5 +25,4 @@ public class ReservationUser {
     @JoinColumn(name = "user_id")
     private User user;
 
-    // 필요한 경우 다른 필드 및 메서드 추가
 }
