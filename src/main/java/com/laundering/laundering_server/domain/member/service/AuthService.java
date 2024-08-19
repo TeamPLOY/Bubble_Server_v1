@@ -53,7 +53,7 @@ public class AuthService
     {
         TokenResponse tokenResponse = jwt.generateAllToken(
                 Jwt.Claims.from(
-                        user.getUserId()
+                        user.getId()
                 ));
 
         user.setRefreshToken(tokenResponse.refreshToken());

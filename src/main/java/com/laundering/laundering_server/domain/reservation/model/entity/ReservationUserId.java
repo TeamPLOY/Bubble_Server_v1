@@ -1,21 +1,23 @@
 package com.laundering.laundering_server.domain.reservation.model.entity;
 
-import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.io.Serializable;
 
 // 복합 키 클래스
-@Embeddable
+@Entity
 @Getter
 @Setter
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor // 기본 생성자 추가
 public class ReservationUserId implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Long resId;
+
     private Long userId;
 }

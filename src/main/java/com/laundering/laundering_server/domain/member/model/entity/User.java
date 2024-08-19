@@ -32,5 +32,5 @@ public class User {
 
     private String email; // 이메일
 
-    private String washLocation; // 세탁실 위치
+    private String roomNum; // 세탁실 위치
 }

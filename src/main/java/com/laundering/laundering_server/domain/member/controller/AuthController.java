@@ -5,6 +5,7 @@ import com.laundering.laundering_server.domain.facade.AuthenticationFacade;
 import com.laundering.laundering_server.domain.member.model.dto.request.TokenRefreshRequest;
 import com.laundering.laundering_server.domain.member.model.dto.response.LoginResponse;
 import com.laundering.laundering_server.domain.member.model.dto.response.TokenResponse;
+import com.laundering.laundering_server.domain.member.model.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -46,5 +47,12 @@ public class AuthController
             @Valid @RequestBody TokenRefreshRequest tokenRefreshRequest
     ) {
         return ResponseEntity.ok(authenticationFacade.refreshToken(tokenRefreshRequest));
+    }
+
+    @Operation(summary = "사용자 정보 확인")
+    @GetMapping("/user")
+    public ResponseEntity<UserResponse> getUserInfo(){
+        UserResponse userInfo = authenticationFacade.getUserInfo(getMemberId());
+        return ResponseEntity.ok(userInfo);
     }
 }

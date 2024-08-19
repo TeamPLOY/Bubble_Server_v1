@@ -1,6 +1,9 @@
 package com.laundering.laundering_server.domain.member.service;
 
+import com.laundering.laundering_server.common.exception.BusinessException;
+import com.laundering.laundering_server.common.exception.ErrorCode;
 import com.laundering.laundering_server.common.socialPlatform.SocialPlatformType;
+import com.laundering.laundering_server.domain.member.model.dto.response.UserResponse;
 import com.laundering.laundering_server.domain.member.model.entity.User;
 import com.laundering.laundering_server.domain.member.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,5 +29,16 @@ public class UserService {
                 .build()
         );
     }
-}
 
+    public UserResponse getUserInfo(Long memberId) {
+        User user = userRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.UNKNOWN_ERROR));
+
+        return UserResponse.builder()
+                .name(user.getName())
+                .studentNum(Long.parseLong(user.getStudentId()))
+                .email(user.getEmail())
+                .roomNum(Long.parseLong(user.getRoomNum()))
+                .build();
+    }
+}
