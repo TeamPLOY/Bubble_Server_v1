@@ -4,6 +4,7 @@ package com.laundering.laundering_server.domain.facade;
 import com.laundering.laundering_server.common.socialPlatform.BsmClient;
 import com.laundering.laundering_server.domain.member.model.dto.response.LoginResponse;
 import com.laundering.laundering_server.domain.member.model.dto.response.TokenResponse;
+import com.laundering.laundering_server.domain.member.model.dto.response.UserResponse;
 import com.laundering.laundering_server.domain.member.service.AuthService;
 import com.laundering.laundering_server.domain.member.service.UserService;
 import com.laundering.laundering_server.domain.member.model.dto.request.TokenRefreshRequest;
@@ -53,6 +54,10 @@ public class AuthenticationFacade {
 
         // 새 회원에 대한 로그인 응답 생성
         return authService.getLoginResponse(newMember);
+    }
+
+    public UserResponse getUserInfo(Long memberId) {
+        return userService.getUserInfo(memberId);
     }
 }
 

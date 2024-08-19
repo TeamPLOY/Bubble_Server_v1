@@ -3,6 +3,7 @@ spring:
     import:
       - optional:file:env/jwt.env[.properties]
       - optional:file:env/oauth2.env[.properties]
+      - optional:file:env/spring.env[.properties]
 
 jwt:
   client-secret: ${JWT_CLIENT_SECRET}
