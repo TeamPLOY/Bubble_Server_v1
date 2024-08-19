@@ -15,6 +15,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReservationUserId implements Serializable {
+    private Long id;
     private Long resId;
     private Long userId;
 }

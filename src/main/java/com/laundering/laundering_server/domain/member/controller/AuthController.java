@@ -15,7 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static com.laundering.laundering_server.common.util.AuthenticationUtil.getMemberId;
-@Tag(name = "인증")
+@Tag(name = "예약")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +24,7 @@ public class AuthController
     private final AuthenticationFacade authenticationFacade;
 
     @Operation(summary = "BSM 로그인 / 가입")
-    @GetMapping("/login/bsm")
+    @GetMapping("/login")
     public ResponseEntity<LoginResponse> loginKakao(@RequestParam String code)
     {
         return ResponseEntity.ok(authenticationFacade.loginBsm(code));

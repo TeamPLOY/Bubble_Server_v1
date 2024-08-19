@@ -12,7 +12,7 @@ import lombok.*;
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long resId; // PK
+    private Long id; // PK
 
     private String washRoom;
 

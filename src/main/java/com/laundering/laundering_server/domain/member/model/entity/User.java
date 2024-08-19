@@ -13,7 +13,7 @@ import lombok.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId; // PK
+    private Long id; // PK
 
     private String socialAccountUid;
 
