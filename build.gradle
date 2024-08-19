@@ -18,36 +18,31 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-web' // Web MVC 애플리케이션을 위한 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
-
-
 	implementation 'org.springframework.boot:spring-boot-starter-quartz'
+
 	implementation 'org.json:json:20231013'
 	implementation 'com.auth0:java-jwt:4.2.2'
 	implementation 'net.nurigo:sdk:4.3.0'
 
 	annotationProcessor 'org.projectlombok:lombok'
-	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-	implementation 'com.google.firebase:firebase-admin:9.1.1'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
 	compileOnly 'org.projectlombok:lombok'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 
-	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.1.2' // MariaDB
-	runtimeOnly 'com.mysql:mysql-connector-j:8.2.0' // mysql
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.1.2'
+	runtimeOnly 'com.mysql:mysql-connector-j:8.2.0'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
-
