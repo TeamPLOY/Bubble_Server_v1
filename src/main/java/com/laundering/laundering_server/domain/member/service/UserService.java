@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -40,5 +42,15 @@ public class UserService {
                 .email(user.getEmail())
                 .roomNum(Long.parseLong(user.getRoomNum()))
                 .build();
+    }
+
+    public void deleteUser(Long memberId) {
+        Optional<User> userOptional = userRepository.findById(memberId);
+
+        if (userOptional.isPresent()) {
+            userRepository.delete(userOptional.get());
+        } else {
+            throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
+        }
     }
 }
