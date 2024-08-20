@@ -23,7 +23,6 @@ public class AuthenticationFacade {
     public LoginResponse loginBsm(String accessToken) {
         var userInfo = bsmClient.getUserInfo(accessToken);
 
-        // 사용자 정보를 기반으로 로그인 처리 수행
         return loginProcess(userInfo.userId());
     }
 
