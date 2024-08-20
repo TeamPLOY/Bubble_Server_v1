@@ -58,5 +58,9 @@ public class AuthenticationFacade {
     public UserResponse getUserInfo(Long memberId) {
         return userService.getUserInfo(memberId);
     }
+
+    public void deleteUser(Long memberId) {
+        userService.deleteUser(memberId);
+    }
 }
 
