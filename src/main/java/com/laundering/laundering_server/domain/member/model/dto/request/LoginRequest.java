@@ -9,5 +9,5 @@ import lombok.Setter;
 public class LoginRequest
 {
     @Schema(description = "AccessToken")
-    private String token;
+    private String accessToken;
 }

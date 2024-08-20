@@ -26,9 +26,9 @@ public class AuthController
     private final AuthenticationFacade authenticationFacade;
 
     @Operation(summary = "BSM 로그인 / 가입")
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginBsm(@RequestBody LoginRequest loginRequest) {
-        return ResponseEntity.ok(authenticationFacade.loginBsm(loginRequest.getToken()));
+        return ResponseEntity.ok(authenticationFacade.loginBsm(loginRequest.getAccessToken()));
     }
 
     @Operation(summary = "로그아웃")
@@ -54,5 +54,12 @@ public class AuthController
     public ResponseEntity<UserResponse> getUserInfo(){
         UserResponse userInfo = authenticationFacade.getUserInfo(getMemberId());
         return ResponseEntity.ok(userInfo);
+    }
+
+    @Operation(summary = "회원 탈퇴")
+    @DeleteMapping("/user")
+    public ResponseEntity<Void> deleteUser(){
+        authenticationFacade.deleteUser(getMemberId());
+        return ResponseEntity.noContent().build();
     }
 }
