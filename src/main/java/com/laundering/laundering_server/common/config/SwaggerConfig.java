@@ -14,7 +14,7 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         // OpenAPI 객체를 생성하고 설정합니다.
         return new OpenAPI()
-                .info(new Info().title("LAUNDERING"))  // API의 기본 정보를 설정합니다.
+                .info(new Info().title("BUBBLE"))  // API의 기본 정보를 설정합니다.
 
                 .addSecurityItem(new SecurityRequirement().addList("jwtAuth"))  // 보안 요구 사항을 추가합니다.
                 .components(new Components()
