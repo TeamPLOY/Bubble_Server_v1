@@ -17,5 +17,4 @@ public class Reservation {
 
     private String washRoom;
 
-    private String weekDay;
 }
