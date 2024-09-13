@@ -41,6 +41,8 @@ dependencies {
 
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.1.2'
 	runtimeOnly 'com.mysql:mysql-connector-j:8.2.0'
+
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {
