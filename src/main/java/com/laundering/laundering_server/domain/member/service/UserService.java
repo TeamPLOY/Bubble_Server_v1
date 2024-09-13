@@ -2,12 +2,13 @@ package com.laundering.laundering_server.domain.member.service;
 
 import com.laundering.laundering_server.common.exception.BusinessException;
 import com.laundering.laundering_server.common.exception.ErrorCode;
-import com.laundering.laundering_server.common.socialPlatform.SocialPlatformType;
+import com.laundering.laundering_server.domain.member.model.dto.request.SignUpRequest;
 import com.laundering.laundering_server.domain.member.model.dto.response.UserResponse;
 import com.laundering.laundering_server.domain.member.model.entity.User;
 import com.laundering.laundering_server.domain.member.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,17 +20,21 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
 
-    public User getBySocialAccount(String socialUid) {
-        return userRepository.findBySocialAccountUid(socialUid).orElse(null);
-    }
-
     @Transactional
-    public User createBySocialAccount(String socialUid)
-    {
-        return userRepository.save(User.builder()
-                .socialAccountUid(socialUid)
-                .build()
-        );
+    public void create(SignUpRequest req) {
+        try {
+            userRepository.save(User.builder()
+                    .email(req.email()) // 사용자 아이디
+                    .password(new BCryptPasswordEncoder().encode(req.password())) // 비밀번호
+                    .name(req.name())
+                    .stuNum(req.stuNum()) // 아이 아이디
+                    .roomNum(req.roomNum())
+                    .build()
+            );
+        } catch (Exception e) {
+            log.error("회원 생성 중 오류 발생: {}", e.getMessage());
+            throw new BusinessException(ErrorCode.UNKNOWN_ERROR);
+        }
     }
 
     public UserResponse getUserInfo(Long memberId) {
@@ -38,9 +43,9 @@ public class UserService {
 
         return UserResponse.builder()
                 .name(user.getName())
-                .studentNum(Long.parseLong(user.getStudentId()))
+                .studentNum(user.getStuNum())
                 .email(user.getEmail())
-                .roomNum(Long.parseLong(user.getRoomNum()))
+                .roomNum(user.getRoomNum())
                 .build();
     }
 
