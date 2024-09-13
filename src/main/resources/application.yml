@@ -5,12 +5,13 @@ spring:
     import:
       - application-db.yml
       - application-security.yml
+      - application-email.yml
 
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
   swagger-ui:
-    path: /swagger-ui.html  # Swagger UI? ?? ??? /swagger-ui.html? ??
-    disable-swagger-default-url: true  # Swagger? ?? URL? ????
-    display-request-duration: true  # ??? ?? ??? ??
-    operations-sorter: alpha  # Swagger UI?? API ??? ??? ??? ??
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: alpha
