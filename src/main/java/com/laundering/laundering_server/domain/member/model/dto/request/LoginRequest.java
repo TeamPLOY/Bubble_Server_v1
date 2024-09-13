@@ -8,6 +8,9 @@ import lombok.Setter;
 @Setter
 public class LoginRequest
 {
-    @Schema(description = "AccessToken")
-    private String accessToken;
+    @Schema(description = "이메일")
+    private String email;
+
+    @Schema(description = "패스워드")
+    private String password;
 }

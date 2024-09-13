@@ -22,16 +22,36 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService
 {
-    private final UserRepository memberRepository;
+    private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private final Jwt jwt;
 
+    public LoginResponse login(String email, String password) {
+        try {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.UNAUTHORIZED));
+
+            // 입력된 비밀번호와 저장된 비밀번호 해시를 비교하여 일치 여부를 확인합니다.
+            if (!passwordEncoder.matches(password, user.getPassword())) {
+                throw new BusinessException(ErrorCode.UNAUTHORIZED);
+            }
+
+            // 비밀번호가 일치하면 로그인 응답 객체를 생성하여 반환합니다.
+            return getLoginResponse(user);
+        } catch (BusinessException e) {
+            log.error("로그인 실패: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("로그인 중 알 수 없는 오류 발생: {}", e.getMessage());
+            throw new BusinessException(ErrorCode.UNKNOWN_ERROR);
+        }
+    }
 
     @Transactional
     public void logout(Long userId)
     {
-        var user = memberRepository.findById(userId)
+        var user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
         user.setRefreshToken(""); // setRefreshToken 메서드 호출
     }
@@ -40,11 +60,11 @@ public class AuthService
     {
         var tokens = publishToken(user);
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            return new LoginResponse(tokens, true); //isNewUser은 떄떄로 필요함
+            return new LoginResponse(tokens); //isNewUser은 떄떄로 필요함
 
         }
         else {
-            return new LoginResponse(tokens, false);
+            return new LoginResponse(tokens);
         }
     }
 
@@ -64,18 +84,17 @@ public class AuthService
     @Transactional
     public TokenResponse refreshToken(TokenRefreshRequest tokenRefreshRequest)
     {
-        var member = memberRepository.findByRefreshToken(tokenRefreshRequest.refreshToken());
-        if (member.isPresent() == false)
+        var user = userRepository.findByRefreshToken(tokenRefreshRequest.refreshToken());
+        if (user.isPresent() == false)
         {
             throw new AccessDeniedException("refresh token 이 만료되었습니다.");
         }
 
         Long memberId;
-        String[] roles;
 
         try
         {
-            Jwt.Claims claims = jwt.verify(member.get().getRefreshToken());
+            Jwt.Claims claims = jwt.verify(user.get().getRefreshToken());
             memberId = claims.getMemberId();
         }
         catch (Exception e)
@@ -85,7 +104,7 @@ public class AuthService
         }
         TokenResponse tokenResponse = jwt.generateAllToken(Jwt.Claims.from(memberId));
 
-        member.get().setRefreshToken(tokenResponse.refreshToken());
+        user.get().setRefreshToken(tokenResponse.refreshToken());
 
         return tokenResponse;
     }

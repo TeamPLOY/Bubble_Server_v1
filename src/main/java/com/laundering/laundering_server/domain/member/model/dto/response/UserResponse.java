@@ -15,11 +15,11 @@ public class UserResponse {
     private String name;
 
     @Schema(description = "학번")
-    private Long studentNum;
+    private int studentNum;
 
     @Schema(description = "이메일")
     private String email;
 
-    @Schema(description = "호실")
-    private Long roomNum;
+    @Schema(description = "기숙사 호실")
+    private String roomNum;
 }
