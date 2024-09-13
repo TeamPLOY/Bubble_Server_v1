@@ -2,8 +2,7 @@ package com.laundering.laundering_server.domain.member.controller;
 
 
 import com.laundering.laundering_server.domain.facade.AuthenticationFacade;
-import com.laundering.laundering_server.domain.member.model.dto.request.LoginRequest;
-import com.laundering.laundering_server.domain.member.model.dto.request.TokenRefreshRequest;
+import com.laundering.laundering_server.domain.member.model.dto.request.*;
 import com.laundering.laundering_server.domain.member.model.dto.response.LoginResponse;
 import com.laundering.laundering_server.domain.member.model.dto.response.TokenResponse;
 import com.laundering.laundering_server.domain.member.model.dto.response.UserResponse;
@@ -12,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +25,18 @@ public class AuthController
 {
     private final AuthenticationFacade authenticationFacade;
 
-    @Operation(summary = "BSM 로그인 / 가입")
+    @Operation(summary = "회원가입")
+    @PostMapping("/signup")
+    public ResponseEntity<String> signUpParent(
+            @Valid @RequestBody SignUpRequest req) {
+        authenticationFacade.signUp(req);
+        return new ResponseEntity<>("회원가입이 완료되었습니다.", HttpStatus.OK);
+    }
+
+    @Operation(summary = "로그인")
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> loginBsm(@RequestBody LoginRequest loginRequest) {
-        return ResponseEntity.ok(authenticationFacade.loginBsm(loginRequest.getAccessToken()));
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest req) {
+        return ResponseEntity.ok(authenticationFacade.login(req));
     }
 
     @Operation(summary = "로그아웃")
@@ -37,7 +45,6 @@ public class AuthController
     public ResponseEntity<Void> logout()
     {
         authenticationFacade.logout(getMemberId());
-
         return ResponseEntity.noContent().build();
     }
 
