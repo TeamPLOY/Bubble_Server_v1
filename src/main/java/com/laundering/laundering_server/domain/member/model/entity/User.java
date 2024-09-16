@@ -21,7 +21,10 @@ public class User {
 
     private Integer stuNum; // 학번
 
+    @Column(unique = true)
     private String email; // 이메일
 
     private String roomNum; // 기숙사 호실
+
+    private String washingRoom; //세탁구역
 }
