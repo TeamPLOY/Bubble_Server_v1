@@ -99,7 +99,18 @@ public class EmailService {
     }
 
     public boolean certificationEmail(int code, String email) {
-        Optional<Email> verification = emailRepository.findTop1ByEmailAndCodeOrderByDateDesc(email, code);
-        return verification.isPresent();
+        // email로 가장 최근의 코드 조회
+        Optional<Email> verification = emailRepository.findTop1ByEmailOrderByDateDesc(email);
+
+        // 검증할 email 데이터가 있는지 확인
+        if (verification.isPresent()) {
+            Email emailEntity = verification.get();
+            // 저장된 코드와 입력된 코드를 비교
+            return emailEntity.getCode() == code;
+        } else {
+            // 해당 이메일에 대한 코드가 없을 경우 false 반환
+            return false;
+        }
     }
+
 }

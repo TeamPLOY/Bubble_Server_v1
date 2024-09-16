@@ -13,11 +13,11 @@ public class EmailFacade {
 
     @Transactional
     public void sendEmail(EmailRequest req) {
-        emailService.sendEmail(req.Email());
+        emailService.sendEmail(req.email());
     }
 
     @Transactional
-    public void certificationEmail(EmailCheckRequest req) {
-        emailService.certificationEmail(req.code(),req.email());
+    public boolean certificationEmail(EmailCheckRequest req) {
+        return emailService.certificationEmail(req.code(),req.email());
     }
 }
