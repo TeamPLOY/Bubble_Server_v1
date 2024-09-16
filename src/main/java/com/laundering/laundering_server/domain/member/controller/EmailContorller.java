@@ -13,20 +13,21 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/email")
+
 public class EmailContorller {
     private final EmailFacade emailFacade;
 
     @Operation(summary = "이메일 전송")
-    @PostMapping("/email")
+    @PostMapping("")
     public ResponseEntity<Void> sendEmail(@RequestBody EmailRequest emailRequest) {
         emailFacade.sendEmail(emailRequest);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "이메일 인증")
-    @GetMapping("/email")
-    public ResponseEntity<Void> certificationEmail(@RequestBody EmailCheckRequest EmailCheckRequest){
-        emailFacade.certificationEmail(EmailCheckRequest);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/check")
+    public ResponseEntity<Boolean> certificationEmail(@RequestBody EmailCheckRequest emailCheckRequest){
+        return ResponseEntity.ok(emailFacade.certificationEmail(emailCheckRequest));
     }
 }
