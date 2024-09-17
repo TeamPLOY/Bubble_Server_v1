@@ -35,4 +35,10 @@ public class WashingMachineController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "세탁기 예약 취소")
+    @PostMapping("/reservation/cancel")
+    public ResponseEntity<Void> cancelReservation() {
+        washingMachineFacade.cancelReservation(getMemberId());
+        return ResponseEntity.noContent().build();
+    }
 }
