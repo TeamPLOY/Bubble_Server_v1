@@ -9,6 +9,7 @@ import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailService {
 
     @Autowired
@@ -100,8 +102,8 @@ public class EmailService {
 
     public boolean certificationEmail(int code, String email) {
         // email로 가장 최근의 코드 조회
-        Optional<Email> verification = emailRepository.findTop1ByEmailOrderByDateDesc(email);
-
+        Optional<Email> verification = emailRepository.findTop1ByEmailOrderByIdDesc(email);
+        log.info(verification.toString());
         // 검증할 email 데이터가 있는지 확인
         if (verification.isPresent()) {
             Email emailEntity = verification.get();

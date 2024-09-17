@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface EmailRepository extends JpaRepository<Email, Long> {
 
     // 이메일과 코드로 가장 최근 날짜의 하나의 레코드만 조회
-    Optional<Email> findTop1ByEmailOrderByDateDesc(String email);
+    Optional<Email> findTop1ByEmailOrderByIdDesc(String email);
 
 }
 
