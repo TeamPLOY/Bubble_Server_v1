@@ -29,12 +29,13 @@ public class AuthService
 
     public LoginResponse login(String email, String password) {
         try {
+            // 이메일로 사용자 찾기
             User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new BusinessException(ErrorCode.UNAUTHORIZED));
+                    .orElseThrow(() -> new BusinessException(ErrorCode.EMAIL_NOT_FOUND));  // 이메일이 존재하지 않을 때
 
-            // 입력된 비밀번호와 저장된 비밀번호 해시를 비교하여 일치 여부를 확인합니다.
+            // 비밀번호 일치 여부 확인
             if (!passwordEncoder.matches(password, user.getPassword())) {
-                throw new BusinessException(ErrorCode.UNAUTHORIZED);
+                throw new BusinessException(ErrorCode.INVALID_PASSWORD); // 비밀번호가 틀렸을 때
             }
 
             // 비밀번호가 일치하면 로그인 응답 객체를 생성하여 반환합니다.
