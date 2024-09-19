@@ -24,6 +24,12 @@ public class UserService {
     @Transactional
     public void create(SignUpRequest req) {
         try {
+
+            // 이메일 중복 여부 확인
+            if (userRepository.existsByEmail(req.email())) {
+                throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS);
+            }
+
             // roomNum에서 prefix ("A", "B")와 숫자 추출
             String prefix = req.roomNum().substring(0, 1);
             int roomNumber = Integer.parseInt(req.roomNum().substring(1));
