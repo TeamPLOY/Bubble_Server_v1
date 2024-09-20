@@ -40,7 +40,6 @@ public class AuthController
     }
 
     @Operation(summary = "로그아웃")
-    @PreAuthorize("hasAnyRole('USER')")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout()
     {
