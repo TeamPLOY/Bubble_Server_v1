@@ -52,7 +52,6 @@ public class UserService {
         }
     }
 
-
     public UserResponse getUserInfo(Long memberId) {
         User user = userRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.UNKNOWN_ERROR));
