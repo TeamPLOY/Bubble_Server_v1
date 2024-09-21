@@ -1,4 +1,11 @@
-package com.laundering.laundering_server.domain.notification.model.entity;
+package com.laundering.laundering_server.domain.notification.repository;
 
-public class NotificationRepository {
+import com.laundering.laundering_server.domain.notification.model.entity.Notification;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface NotificationRepository extends JpaRepository<Notification, Long>
+{
+
 }
+
+
