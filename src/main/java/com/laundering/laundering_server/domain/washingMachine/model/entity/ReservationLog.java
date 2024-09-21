@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -11,7 +12,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor // 기본 생성자 추가
-public class Reservation {
+public class ReservationLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,7 +21,9 @@ public class Reservation {
 
     private boolean isCancel;
 
-    private LocalDate date;
+    private LocalDateTime date; // 예약한 날짜
+
+    private LocalDate resDate; // 예약할 날짜
 
     private String washingRoom;
 }
