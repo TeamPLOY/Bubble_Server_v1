@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/email")
 
-public class EmailContorller {
+public class EmailController {
     private final EmailFacade emailFacade;
 
     @Operation(summary = "이메일 전송")
