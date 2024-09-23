@@ -1,7 +1,6 @@
 package com.laundering.laundering_server.domain.washingMachine.controller;
 
 
-import com.laundering.laundering_server.domain.facade.EmailFacade;
 import com.laundering.laundering_server.domain.facade.WashingMachineFacade;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.response.WashingMachineResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +26,13 @@ public class WashingMachineController {
     public ResponseEntity<List<WashingMachineResponse>> getStatus() {
         List<WashingMachineResponse> ws = washingMachineFacade.getStatus(getMemberId());
         return ResponseEntity.ok(ws);
+    }
+
+    @Operation(summary = "세탁기 예약")
+    @PostMapping("/reservation")
+    public ResponseEntity<Void> reservation() {
+        washingMachineFacade.reservation(getMemberId());
+        return ResponseEntity.noContent().build();
     }
 
 }
