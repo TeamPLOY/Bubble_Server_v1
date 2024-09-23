@@ -43,5 +43,17 @@ public class ReservationService {
         reservationRepository.save(reservation);
     }
 
+    public void cancelReservation(Long userId) {
+        // userId로 예약 조회
+        Optional<Reservation> reservationOpt = reservationRepository.findByUserId(userId);
 
+        // 예약이 존재하면 isCancel을 true로 변경하고 저장
+        if (reservationOpt.isPresent()) {
+            Reservation reservation = reservationOpt.get();
+            reservation.setCancel(true); // isCancel 값을 true로 설정
+            reservationRepository.save(reservation); // 변경 사항 저장
+        } else {
+            throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
+        }
+    }
 }

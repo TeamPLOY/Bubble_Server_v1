@@ -14,7 +14,9 @@ public enum ErrorCode {
     UNKNOWN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 오류입니다."),
     EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT,"이미 사용 중인 이메일입니다."),
     EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND,"찾을 수 없는 이메일 입니다."),
-    INVALID_PASSWORD(HttpStatus.BAD_REQUEST,"비밀번호가 일치하지 않습니다.");
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST,"비밀번호가 일치하지 않습니다."),
+    RESERVATION_ALREADY_EXISTS(HttpStatus.CONFLICT,"이미 예약이 존재합니다.");
+
 
     private final HttpStatus status;
     private final String message;

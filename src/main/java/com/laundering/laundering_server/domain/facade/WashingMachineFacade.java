@@ -24,6 +24,9 @@ public class WashingMachineFacade {
         reservationService.reservation(id);
     }
 
-
+    @Transactional
+    public void cancelReservation(Long id) {
+        reservationService.cancelReservation(id);
+    }
 }
 
