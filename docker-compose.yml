@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  bubble_server:
+    image: noahmik1/bubble:1
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./env/email.env
+      - ./env/jwt.env
+      - ./env/spring.env
