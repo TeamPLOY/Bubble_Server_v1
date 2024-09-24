@@ -2,6 +2,7 @@ package com.laundering.laundering_server.domain.washingMachine.service;
 
 import com.laundering.laundering_server.common.exception.BusinessException;
 import com.laundering.laundering_server.common.exception.ErrorCode;
+import com.laundering.laundering_server.domain.member.model.entity.User;
 import com.laundering.laundering_server.domain.member.repository.UserRepository;
 import com.laundering.laundering_server.domain.washingMachine.model.entity.Reservation;
 import com.laundering.laundering_server.domain.washingMachine.repository.ReservationRepository;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -20,12 +22,17 @@ public class ReservationService {
 
     @Autowired
     private ReservationRepository reservationRepository;
-    public void reservation(Long userId) {
-        // 오늘 날짜
-        LocalDate today = LocalDate.now();
+
+    @Autowired
+    private final UserRepository userRepository;
+
+    public void reservation(Long userId, LocalDate date) {
+        // userId로 User 테이블에서 해당 사용자 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
         // userId와 오늘 날짜로 예약 조회
-        Optional<Reservation> existingReservation = reservationRepository.findByUserIdAndDate(userId, today);
+        Optional<Reservation> existingReservation = reservationRepository.findByUserIdAndDate(userId, date);
 
         // 예약이 이미 존재하면 처리
         if (existingReservation.isPresent()) {
@@ -44,7 +51,8 @@ public class ReservationService {
             Reservation reservation = Reservation.builder()
                     .userId(userId)        // 예약한 사용자 ID
                     .isCancel(false)       // 예약 취소 상태 (초기값 false)
-                    .date(today)           // 예약 날짜 (현재 날짜)
+                    .date(date)           // 예약 날짜 (현재 날짜)
+                    .washingRoom(user.getWashingRoom()) // User 테이블에서 조회한 washingRoom 값 설정
                     .build();
 
             // 예약을 데이터베이스에 저장
@@ -52,10 +60,9 @@ public class ReservationService {
         }
     }
 
-
-    public void cancelReservation(Long userId) {
+    public void cancelReservation(Long userId, LocalDate date) {
         // userId로 예약 조회
-        Optional<Reservation> reservationOpt = reservationRepository.findByUserId(userId);
+        Optional<Reservation> reservationOpt = reservationRepository.findByUserIdAndDate(userId,date);
 
         // 예약이 존재하면 isCancel을 true로 변경하고 저장
         if (reservationOpt.isPresent()) {
@@ -66,4 +73,14 @@ public class ReservationService {
             throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
         }
     }
+
+    public List<Reservation> getReservation(Long userId) {
+        // Fetch the User based on userId
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        String washingRoom = user.getWashingRoom();
+
+        return reservationRepository.findByWashingRoom(washingRoom);
+    }
+
 }

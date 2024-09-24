@@ -2,6 +2,7 @@ package com.laundering.laundering_server.domain.washingMachine.controller;
 
 
 import com.laundering.laundering_server.domain.facade.WashingMachineFacade;
+import com.laundering.laundering_server.domain.washingMachine.model.dto.request.ReservationRequest;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.response.WashingMachineResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,15 +31,26 @@ public class WashingMachineController {
 
     @Operation(summary = "세탁기 예약")
     @PostMapping("/reservation")
-    public ResponseEntity<Void> reservation() {
-        washingMachineFacade.reservation(getMemberId());
+    public ResponseEntity<Void> reservation(
+            @RequestBody ReservationRequest reservationRequest
+    ) {
+        washingMachineFacade.reservation(getMemberId(),reservationRequest.date());
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "세탁기 예약 취소")
     @PostMapping("/reservation/cancel")
-    public ResponseEntity<Void> cancelReservation() {
-        washingMachineFacade.cancelReservation(getMemberId());
+    public ResponseEntity<Void> cancelReservation(
+        @RequestBody ReservationRequest reservationRequest
+    ) {
+        washingMachineFacade.cancelReservation(getMemberId(),reservationRequest.date());
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "세탁기 예약 상태 조회")
+    @GetMapping("/reservation")
+    public ResponseEntity<Void> getReservation() {
+        washingMachineFacade.getReservation(getMemberId());
         return ResponseEntity.noContent().build();
     }
 }

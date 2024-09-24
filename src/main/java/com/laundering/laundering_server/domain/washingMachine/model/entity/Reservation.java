@@ -21,4 +21,6 @@ public class Reservation {
     private boolean isCancel;
 
     private LocalDate date;
+
+    private String washingRoom;
 }
