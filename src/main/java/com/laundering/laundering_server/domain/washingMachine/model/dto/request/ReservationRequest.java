@@ -1,8 +1,8 @@
 package com.laundering.laundering_server.domain.washingMachine.model.dto.request;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public record ReservationRequest(
-        LocalDateTime date
+        LocalDate date
 ) {
 }
