@@ -4,6 +4,7 @@ import com.laundering.laundering_server.common.exception.BusinessException;
 import com.laundering.laundering_server.common.exception.ErrorCode;
 import com.laundering.laundering_server.domain.member.model.entity.User;
 import com.laundering.laundering_server.domain.member.repository.UserRepository;
+import com.laundering.laundering_server.domain.washingMachine.model.dto.response.ReservationSummaryResponse;
 import com.laundering.laundering_server.domain.washingMachine.model.entity.Reservation;
 import com.laundering.laundering_server.domain.washingMachine.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -26,7 +31,7 @@ public class ReservationService {
     @Autowired
     private final UserRepository userRepository;
 
-    public void reservation(Long userId, LocalDate date) {
+    public void reservation(Long userId, LocalDateTime date) {
         // userId로 User 테이블에서 해당 사용자 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
@@ -60,7 +65,7 @@ public class ReservationService {
         }
     }
 
-    public void cancelReservation(Long userId, LocalDate date) {
+    public void cancelReservation(Long userId, LocalDateTime date) {
         // userId로 예약 조회
         Optional<Reservation> reservationOpt = reservationRepository.findByUserIdAndDate(userId,date);
 
@@ -74,13 +79,49 @@ public class ReservationService {
         }
     }
 
-    public List<Reservation> getReservation(Long userId) {
-        // Fetch the User based on userId
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public List<ReservationSummaryResponse> getReservation(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         String washingRoom = user.getWashingRoom();
 
-        return reservationRepository.findByWashingRoom(washingRoom);
+        // 전 주 일요일 22시
+        LocalDateTime lastSunday22 = LocalDateTime.now()
+                .with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.SUNDAY))
+                .withHour(22)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
+
+        // 이번 주 일요일 21:59
+        LocalDateTime thisSunday21_59 = LocalDateTime.now()
+                .with(TemporalAdjusters.next(java.time.DayOfWeek.SUNDAY))
+                .withHour(21)
+                .withMinute(59)
+                .withSecond(59)
+                .withNano(999999999);
+
+        // 예약 기록 조회
+        List<Reservation> reservations = reservationRepository.findByWashingRoomAndDateBetween(washingRoom, lastSunday22, thisSunday21_59);
+
+        // 해당 기간의 모든 날짜 생성
+        List<LocalDate> allDates = lastSunday22.toLocalDate().datesUntil(thisSunday21_59.toLocalDate().plusDays(1)).collect(Collectors.toList());
+
+        // 날짜별 유저 수 매핑
+        Map<LocalDate, Long> reservationCountMap = reservations.stream()
+                .collect(Collectors.groupingBy(
+                        r -> r.getDate().toLocalDate(),  // 날짜별로 그룹화
+                        Collectors.counting()             // 유저 수 카운팅
+                ));
+
+        // 모든 날짜에 대해 userCount를 0으로 설정, 만약 예약이 있으면 해당 유저 수로 덮어쓰기
+        List<ReservationSummaryResponse> summaryList = allDates.stream()
+                .map(date -> new ReservationSummaryResponse(
+                        date,
+                        reservationCountMap.getOrDefault(date, 0L)))  // 예약이 없으면 0, 있으면 실제 유저 수
+                .collect(Collectors.toList());
+
+        return summaryList;
     }
 
 }
