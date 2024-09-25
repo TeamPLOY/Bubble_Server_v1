@@ -25,6 +25,7 @@ public class EmailContorller {
         return ResponseEntity.noContent().build();
     }
 
+    // 이 이메일은 스케줄러 사용해서 5분 뒤 디비에서 삭제
     @Operation(summary = "이메일 인증")
     @PostMapping("/check")
     public ResponseEntity<Boolean> certificationEmail(@RequestBody EmailCheckRequest emailCheckRequest){
