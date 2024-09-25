@@ -52,7 +52,7 @@ public class WashingMachineService
             String washingRoom = user.getWashingRoom();
 
             // URL을 구성하고 HTTP GET 요청 보내기
-            String url = String.format("https://build-bubble-proxy-server.vercel.app//home/%s", washingRoom);
+            String url = String.format("https://build-bubble-proxy-server.vercel.app/home/%s", washingRoom);
             String response = restTemplate.getForObject(url, String.class);
 
             // JSON 응답을 WashingMachineResponse 리스트로 변환하기
