@@ -16,11 +16,13 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .info(new Info().title("BUBBLE"))  // API의 기본 정보를 설정합니다.
 
-                .addSecurityItem(new SecurityRequirement().addList("jwtAuth"))  // 보안 요구 사항을 추가합니다.
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))  // 보안 요구 사항을 추가합니다.
                 .components(new Components()
-                        .addSecuritySchemes("jwtAuth", new io.swagger.v3.oas.models.security.SecurityScheme()
-                                .name("access_token")  // 보안 스키마의 이름을 설정합니다.
-                                .type(SecurityScheme.Type.APIKEY)  // 보안 스키마의 유형을 API 키로 설정합니다.
-                                .in(SecurityScheme.In.HEADER)));  // API 키를 HTTP 헤더에 포함시킵니다.
+                        .addSecuritySchemes("bearerAuth", new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)  // 보안 스키마의 유형을 HTTP로 설정합니다.
+                                .scheme("bearer")  // Bearer 토큰 인증 방식으로 설정합니다.
+                                .bearerFormat("JWT")  // 토큰의 형식을 JWT로 설정합니다.
+                                .in(SecurityScheme.In.HEADER)  // 토큰이 HTTP 헤더에 포함됨을 나타냅니다.
+                                .name("Authorization")));  // Bearer 토큰을 보낼 헤더의 이름을 설정합니다.
     }
 }

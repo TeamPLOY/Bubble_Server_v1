@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,19 +29,19 @@ public class JwtAuthenticationFilter extends GenericFilter {
             log.info("getAuthentication is null");
             String token = getAccessToken(httpServletRequest);
 
-            log.info("토큰 : "+token);
+            log.info("토큰 : " + token);
 
             if (token != null) {
                 try {
                     Jwt.Claims claims = verify(token);
                     Long memberId = claims.getMemberId();
 
-                    log.info("memberId : "+memberId);
+                    log.info("memberId : " + memberId);
 
                     if (memberId != null) {
                         UsernamePasswordAuthenticationToken authentication =
                                 new UsernamePasswordAuthenticationToken(memberId, null);
-                        log.info("authentication : "+authentication.toString());
+                        log.info("authentication : " + authentication.toString());
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
                 } catch (Exception e) {
@@ -55,16 +56,36 @@ public class JwtAuthenticationFilter extends GenericFilter {
     }
 
     private String getAccessToken(HttpServletRequest request) {
-        String accessToken = request.getHeader("access_token");
-        log.info("accessToken : "+ accessToken);
+        log.warn("리퀘스트 로그 시작");
 
-        if (accessToken != null && !accessToken.isBlank()) {
-            try {
-                return URLDecoder.decode(accessToken, StandardCharsets.UTF_8);
-            } catch (Exception e) {
-                log.warn(e.getMessage(), e);
-            }
+        log.warn("Method: " + request.getMethod());
+        log.warn("Request URI: " + request.getRequestURI());
+        log.warn("Query String: " + request.getQueryString());
+
+        log.warn("Headers:");
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            log.info("헤더: " + headerName + " 값: " + request.getHeader(headerName));
         }
+
+        String authorizationHeader = request.getHeader("Authorization"); // Authorization 헤더에서 토큰을 가져옴
+        log.info("Raw Authorization Header : " + authorizationHeader);
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            log.info("Authorization 헤더에 Bearer 토큰 존재");
+            String token = authorizationHeader.substring(7); // 'Bearer ' 이후의 토큰만 추출
+            try {
+                String decodedToken = URLDecoder.decode(token, StandardCharsets.UTF_8);
+                log.info("Decoded accessToken : " + decodedToken);
+                return decodedToken;
+            } catch (Exception e) {
+                log.error("엑세스 토큰 디코딩 실패: " + e.getMessage(), e);
+            }
+        } else {
+            log.warn("Authorization 헤더가 null이거나 Bearer 토큰이 없습니다.");
+        }
+
         return null;
     }
 
