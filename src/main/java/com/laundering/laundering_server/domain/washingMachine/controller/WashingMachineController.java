@@ -5,7 +5,6 @@ import com.laundering.laundering_server.domain.facade.WashingMachineFacade;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.request.ReservationRequest;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.response.ReservationSummaryResponse;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.response.WashingMachineResponse;
-import com.laundering.laundering_server.domain.washingMachine.model.entity.Reservation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
