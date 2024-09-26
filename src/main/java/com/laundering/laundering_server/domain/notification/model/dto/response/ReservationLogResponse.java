@@ -5,6 +5,7 @@ import java.time.LocalDate;
 public record ReservationLogResponse(
         LocalDate date,
         String resDate,
-        boolean cancel
+        boolean cancel,
+        String washingRoom
 ) {
 }
