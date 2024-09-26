@@ -2,6 +2,7 @@ package com.laundering.laundering_server.domain.facade;
 
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationDetailResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationResponse;
+import com.laundering.laundering_server.domain.notification.model.dto.response.ReservationLogResponse;
 import com.laundering.laundering_server.domain.notification.service.NotificationService;
 import com.laundering.laundering_server.domain.washingMachine.model.entity.ReservationLog;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class NotificationFacade {
     }
 
     @Transactional
-    public List<ReservationLog> getReservationHistory(Long id) {
+    public List<ReservationLogResponse> getReservationHistory(Long id) {
         return notificationService.getReservationHistory(id);
     }
 

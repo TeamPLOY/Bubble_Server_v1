@@ -3,6 +3,7 @@ package com.laundering.laundering_server.domain.notification.controller;
 import com.laundering.laundering_server.domain.facade.NotificationFacade;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationDetailResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationResponse;
+import com.laundering.laundering_server.domain.notification.model.dto.response.ReservationLogResponse;
 import com.laundering.laundering_server.domain.washingMachine.model.entity.ReservationLog;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +38,7 @@ public class NotificationController {
 
     @Operation(summary = "예약 사용기록")
     @GetMapping("/history")
-    public ResponseEntity<List<ReservationLog>> getReservationHistory() {
+    public ResponseEntity<List<ReservationLogResponse>> getReservationHistory() {
         return ResponseEntity.ok(notificationFacade.getReservationHistory(getMemberId()));
 
     }
