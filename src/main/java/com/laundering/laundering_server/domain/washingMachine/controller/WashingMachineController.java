@@ -55,7 +55,7 @@ public class WashingMachineController {
         return ResponseEntity.ok(reservations);
     }
 
-    @Operation(summary = "당주 예약여부 확인")
+    @Operation(summary = "당주 예약 여부 확인")
     @GetMapping("/isReserved")
     public ResponseEntity<Boolean> getIsReserved() {
         Boolean IsReserved = washingMachineFacade.getIsReserved(getMemberId());

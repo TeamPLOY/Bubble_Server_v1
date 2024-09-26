@@ -1,5 +1,8 @@
 package com.laundering.laundering_server.domain.notification.service;
 
+import com.laundering.laundering_server.common.exception.BusinessException;
+import com.laundering.laundering_server.common.exception.ErrorCode;
+import com.laundering.laundering_server.domain.member.model.entity.User;
 import com.laundering.laundering_server.domain.member.repository.UserRepository;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationDetailResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationResponse;
@@ -27,6 +30,9 @@ public class NotificationService
     @Autowired
     private ReservationLogRepository reservationLogRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public List<NotificationResponse> getNotification() {
         return notificationRepository.findAll().stream()
                 .map(notification -> new NotificationResponse(notification.getTitle(), notification.getDate()))
@@ -42,14 +48,21 @@ public class NotificationService
     }
 
 
-    public List<ReservationLogResponse> getReservationHistory(Long userId) {
-        List<ReservationLog> reservationLogs = reservationLogRepository.findByUserId(userId);
+    public List<ReservationLogResponse> getReservationHistory(Long id) {
+        // 사용자 정보 조회
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.UNKNOWN_ERROR));
 
+        // 해당 사용자의 예약 기록 조회
+        List<ReservationLog> reservationLogs = reservationLogRepository.findByUserId(id);
+
+        // 예약 기록을 ReservationLogResponse로 변환하면서 washingRoom 추가
         return reservationLogs.stream()
                 .map(log -> new ReservationLogResponse(
-                        log.getDate().toLocalDate(),   // LocalDateTime에서 LocalDate로 변환
-                        log.getResDate().toString(),   // LocalDate를 String으로 변환
-                        log.isCancel()                 // 취소 여부 전달
+                        log.getDate().toLocalDate(),       // LocalDateTime에서 LocalDate로 변환
+                        log.getResDate().toString(),       // LocalDate를 String으로 변환
+                        log.isCancel(),                   // 취소 여부 전달
+                        user.getWashingRoom()             // 사용자의 washingRoom 추가
                 ))
                 .collect(Collectors.toList());
     }
