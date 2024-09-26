@@ -4,7 +4,7 @@ import com.laundering.laundering_server.domain.facade.NotificationFacade;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationDetailResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.ReservationLogResponse;
-import com.laundering.laundering_server.domain.washingMachine.model.entity.ReservationLog;
+import com.laundering.laundering_server.domain.notification.model.dto.request.saveNotificationRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +41,22 @@ public class NotificationController {
     public ResponseEntity<List<ReservationLogResponse>> getReservationHistory() {
         return ResponseEntity.ok(notificationFacade.getReservationHistory(getMemberId()));
 
+    }
+
+    @Operation(summary = "알림 선택")
+    @PostMapping("/save")
+    public ResponseEntity<Void> saveNotification(
+            saveNotificationRequest saveNotificationRequest
+    ){
+        notificationFacade.saveNotification(saveNotificationRequest,getMemberId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "알림 조회")
+    @PostMapping("/check")
+    public ResponseEntity<Boolean> getResNotification(
+            saveNotificationRequest saveNotificationRequest
+    ){
+        return ResponseEntity.ok(notificationFacade.getResNotification(saveNotificationRequest,getMemberId()));
     }
 }

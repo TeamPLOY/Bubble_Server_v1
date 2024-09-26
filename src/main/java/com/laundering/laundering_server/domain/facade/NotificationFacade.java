@@ -1,10 +1,10 @@
 package com.laundering.laundering_server.domain.facade;
 
+import com.laundering.laundering_server.domain.notification.model.dto.request.saveNotificationRequest;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationDetailResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.ReservationLogResponse;
 import com.laundering.laundering_server.domain.notification.service.NotificationService;
-import com.laundering.laundering_server.domain.washingMachine.model.entity.ReservationLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,5 +31,13 @@ public class NotificationFacade {
         return notificationService.getReservationHistory(id);
     }
 
+    @Transactional
+    public void saveNotification(saveNotificationRequest request, Long id) {
+        notificationService.saveNotification(request,id);
+    }
 
+    @Transactional
+    public boolean getResNotification(saveNotificationRequest request, Long id) {
+        return notificationService.getResNotification(request,id);
+    }
 }
