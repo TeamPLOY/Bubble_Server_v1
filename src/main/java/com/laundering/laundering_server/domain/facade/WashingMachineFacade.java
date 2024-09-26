@@ -36,5 +36,9 @@ public class WashingMachineFacade {
         return reservationService.getReservation(id);
     }
 
+    public boolean getIsReserved(Long id) {
+        return reservationService.getIsReserved(id);
+    }
+
 }
 

@@ -4,6 +4,8 @@ import com.laundering.laundering_server.domain.member.repository.UserRepository;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationDetailResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationResponse;
 import com.laundering.laundering_server.domain.notification.repository.NotificationRepository;
+import com.laundering.laundering_server.domain.washingMachine.model.entity.ReservationLog;
+import com.laundering.laundering_server.domain.washingMachine.repository.ReservationLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,9 @@ public class NotificationService
     @Autowired
     private NotificationRepository notificationRepository;
 
+    @Autowired
+    private ReservationLogRepository reservationLogRepository;
+
     public List<NotificationResponse> getNotification() {
         return notificationRepository.findAll().stream()
                 .map(notification -> new NotificationResponse(notification.getTitle(), notification.getDate()))
@@ -33,6 +38,12 @@ public class NotificationService
                         notification.getDetail(),
                         notification.getDate()))
                 .collect(Collectors.toList());
+    }
+
+
+    public List<ReservationLog> getReservationHistory(Long userId) {
+        // userId로 예약 로그 조회
+        return reservationLogRepository.findByUserId(userId);
     }
 }
 
