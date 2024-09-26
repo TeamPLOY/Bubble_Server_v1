@@ -7,16 +7,21 @@ import com.laundering.laundering_server.domain.member.repository.UserRepository;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationDetailResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.ReservationLogResponse;
+import com.laundering.laundering_server.domain.notification.model.entity.NotifiReservation;
+import com.laundering.laundering_server.domain.notification.repository.NotifiReservationRepository;
 import com.laundering.laundering_server.domain.notification.repository.NotificationRepository;
 import com.laundering.laundering_server.domain.washingMachine.model.entity.ReservationLog;
 import com.laundering.laundering_server.domain.washingMachine.repository.ReservationLogRepository;
+import com.laundering.laundering_server.domain.notification.model.dto.request.saveNotificationRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,6 +34,9 @@ public class NotificationService
 
     @Autowired
     private ReservationLogRepository reservationLogRepository;
+
+    @Autowired
+    private NotifiReservationRepository notifiReservationRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -47,7 +55,6 @@ public class NotificationService
                 .collect(Collectors.toList());
     }
 
-
     public List<ReservationLogResponse> getReservationHistory(Long id) {
         // 사용자 정보 조회
         User user = userRepository.findById(id)
@@ -65,5 +72,25 @@ public class NotificationService
                         user.getWashingRoom()             // 사용자의 washingRoom 추가
                 ))
                 .collect(Collectors.toList());
+    }
+
+    public void saveNotification(saveNotificationRequest request, Long userId) {
+        // NotifiReservation 엔티티 생성
+        NotifiReservation notifiReservation = NotifiReservation.builder()
+                .userId(userId)
+                .machine(request.machine())
+                .date(LocalDate.now()) // 현재 날짜로 설정
+                .build();
+
+        // DB에 저장
+        notifiReservationRepository.save(notifiReservation);
+    }
+
+    public boolean getResNotification(saveNotificationRequest request, Long userId) {
+        // userId와 요청된 machine을 기준으로 NotifiReservation 조회
+        Optional<NotifiReservation> reservation = notifiReservationRepository.findByUserIdAndMachine(userId, request.machine());
+
+        // 예약 알림이 존재하면 true 반환, 존재하지 않으면 false 반환
+        return reservation.isPresent();
     }
 }
