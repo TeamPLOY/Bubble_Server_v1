@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
@@ -112,7 +113,7 @@ public class ReservationService {
 
     public List<ReservationSummaryResponse> getReservation(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
         String washingRoom = user.getWashingRoom();
 
@@ -199,6 +200,34 @@ public class ReservationService {
 
         return summaryList;
     }
+    public boolean getIsReserved(Long userId) {
+        // 현재 시간 가져오기
+        LocalDateTime now = LocalDateTime.now();
+        DayOfWeek dayOfWeek = now.getDayOfWeek();
 
+        // 현재 요일이 일요일이고 시간대가 22:00 ~ 23:59인지 확인
+        boolean isSundayLateEvening = dayOfWeek == DayOfWeek.SUNDAY &&
+                now.toLocalTime().isAfter(LocalTime.of(22, 0)) &&
+                now.toLocalTime().isBefore(LocalTime.of(23, 59, 59));
 
+        // 기간 설정을 위한 날짜 계산
+        LocalDate startDate;
+        LocalDate endDate;
+
+        if (isSundayLateEvening) {
+            // 이번 주 일요일 22:00부터 다음 주 일요일 21:59까지
+            startDate = now.toLocalDate();
+            endDate = now.plusWeeks(1).with(DayOfWeek.SUNDAY).minusHours(2).toLocalDate();
+        } else {
+            // 저번 주 일요일 22:00부터 이번 주 일요일 21:59까지
+            startDate = now.minusWeeks(1).with(DayOfWeek.SUNDAY).toLocalDate();
+            endDate = now.with(DayOfWeek.SUNDAY).minusHours(2).toLocalDate();
+        }
+
+        // 해당 기간 동안 userId로 예약된 내역이 있는지 조회
+        List<Reservation> reservations = reservationRepository.findByUserIdAndDateBetween(userId, startDate, endDate);
+
+        // 예약 내역이 존재하면 true 반환
+        return !reservations.isEmpty();
+    }
 }

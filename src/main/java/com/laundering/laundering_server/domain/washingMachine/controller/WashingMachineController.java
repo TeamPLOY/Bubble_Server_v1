@@ -54,4 +54,11 @@ public class WashingMachineController {
         List<ReservationSummaryResponse> reservations = washingMachineFacade.getReservation(getMemberId());
         return ResponseEntity.ok(reservations);
     }
+
+    @Operation(summary = "당주 예약여부 확인")
+    @GetMapping("/isReserved")
+    public ResponseEntity<Boolean> getIsReserved() {
+        Boolean IsReserved = washingMachineFacade.getIsReserved(getMemberId());
+        return ResponseEntity.ok(IsReserved);
+    }
 }

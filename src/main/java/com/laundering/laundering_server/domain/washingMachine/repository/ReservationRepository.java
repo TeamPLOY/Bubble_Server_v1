@@ -10,9 +10,8 @@ import java.util.Optional;
 import java.time.LocalDate;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    // userId로 예약을 조회하는 메소드
-
     Optional<Reservation> findByUserIdAndDate(Long userId, LocalDate date);
     List<Reservation> findByWashingRoomAndDateBetween(String washingRoom, LocalDate startDate, LocalDate endDate);
+    List<Reservation> findByUserIdAndDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
 
 }

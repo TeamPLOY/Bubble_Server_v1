@@ -25,5 +25,5 @@ public class ReservationLog {
 
     private LocalDate resDate; // 예약할 날짜
 
-    private String washingRoom;
+    private String washingRoom; // 세탁실 위치
 }
