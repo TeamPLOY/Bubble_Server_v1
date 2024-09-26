@@ -3,6 +3,7 @@ package com.laundering.laundering_server.domain.notification.service;
 import com.laundering.laundering_server.domain.member.repository.UserRepository;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationDetailResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationResponse;
+import com.laundering.laundering_server.domain.notification.model.dto.response.ReservationLogResponse;
 import com.laundering.laundering_server.domain.notification.repository.NotificationRepository;
 import com.laundering.laundering_server.domain.washingMachine.model.entity.ReservationLog;
 import com.laundering.laundering_server.domain.washingMachine.repository.ReservationLogRepository;
@@ -41,11 +42,15 @@ public class NotificationService
     }
 
 
-    public List<ReservationLog> getReservationHistory(Long userId) {
-        // userId로 예약 로그 조회
-        return reservationLogRepository.findByUserId(userId);
+    public List<ReservationLogResponse> getReservationHistory(Long userId) {
+        List<ReservationLog> reservationLogs = reservationLogRepository.findByUserId(userId);
+
+        return reservationLogs.stream()
+                .map(log -> new ReservationLogResponse(
+                        log.getDate().toLocalDate(),   // LocalDateTime에서 LocalDate로 변환
+                        log.getResDate().toString(),   // LocalDate를 String으로 변환
+                        log.isCancel()                 // 취소 여부 전달
+                ))
+                .collect(Collectors.toList());
     }
 }
-
-
-
