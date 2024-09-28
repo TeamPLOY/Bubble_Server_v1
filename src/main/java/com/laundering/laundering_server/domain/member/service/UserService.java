@@ -61,6 +61,7 @@ public class UserService {
                 .studentNum(user.getStuNum())
                 .email(user.getEmail())
                 .roomNum(user.getRoomNum())
+                .washingRoom(user.getWashingRoom())
                 .build();
     }
 
