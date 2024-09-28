@@ -95,7 +95,13 @@ public class NotificationService
     }
 
     public void saveNotification(saveNotificationRequest request, Long userId) {
-        // NotifiReservation 엔티티 생성
+        // userId와 machine으로 NotifiReservation 조회
+        Optional<NotifiReservation> existingNotification = notifiReservationRepository.findByUserIdAndMachine(userId, request.machine());
+
+        // 기존 알림이 존재하면 삭제
+        existingNotification.ifPresent(notifiReservationRepository::delete);
+
+        // 새로운 NotifiReservation 엔티티 생성
         NotifiReservation notifiReservation = NotifiReservation.builder()
                 .userId(userId)
                 .machine(request.machine())
@@ -105,6 +111,7 @@ public class NotificationService
         // DB에 저장
         notifiReservationRepository.save(notifiReservation);
     }
+
 
     public boolean getResNotification(saveNotificationRequest request, Long userId) {
         // userId와 요청된 machine을 기준으로 NotifiReservation 조회
