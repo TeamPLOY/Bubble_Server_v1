@@ -16,9 +16,11 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId; // 예약한 사람
+    private Long userId;
 
-    private LocalDate date; // 예약 날짜
+    private boolean isCancel;
 
-    private String washingRoom; // 세탁실
+    private LocalDate date;
+
+    private String washingRoom;
 }
