@@ -17,9 +17,9 @@ public class ReservationLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
+    private Long userId; // 예약한 사람
 
-    private boolean isCancel;
+    private boolean isCancel; // 예약 or 취소
 
     private LocalDateTime date; // 예약한 날짜
 
