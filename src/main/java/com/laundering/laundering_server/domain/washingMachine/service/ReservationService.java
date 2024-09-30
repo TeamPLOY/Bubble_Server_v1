@@ -40,14 +40,55 @@ public class ReservationService {
     @Autowired
     private final UserRepository userRepository;
 
+//    public void reservation(Long userId, LocalDate date) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+//
+//        // userId와 오늘 날짜로 예약 조회
+//        Optional<Reservation> existingReservation = reservationRepository.findByUserIdAndDate(userId, date);
+//
+//        // 예약이 이미 존재하면 처리
+//        if (existingReservation.isPresent()) {
+//            throw new BusinessException(ErrorCode.RESERVATION_ALREADY_EXISTS);
+//        }
+//
+//        // 주 시작일과 끝일 계산 (예: 일요일 시작, 토요일 끝)
+//        LocalDate startOfWeek = date.with(DayOfWeek.SUNDAY);
+//        LocalDate endOfWeek = date.with(DayOfWeek.SATURDAY);
+//
+//        // 해당 주에 예약이 있는지 확인
+//        List<Reservation> weeklyReservations = reservationRepository.findByUserIdAndDateBetween(userId, startOfWeek, endOfWeek);
+//
+//        if (!weeklyReservations.isEmpty()) {
+//            throw new BusinessException(ErrorCode.RESERVATION_ALREADY_EXISTS_THIS_WEEK);
+//        }
+//
+//        // 새로운 예약 생성
+//        Reservation reservation = Reservation.builder()
+//                .userId(userId)        // 예약한 사용자 ID
+//                .date(date)           // 예약 날짜 (현재 날짜)
+//                .washingRoom(user.getWashingRoom()) // User 테이블에서 조회한 washingRoom 값 설정
+//                .build();
+//
+//        ReservationLog reservationLog = ReservationLog.builder()
+//                .userId(userId)
+//                .isCancel(false)
+//                .date(LocalDateTime.now())
+//                .resDate(date)
+//                .washingRoom(user.getWashingRoom())
+//                .build();
+//
+//        // 예약을 데이터베이스에 저장
+//        reservationRepository.save(reservation);
+//        reservationLogRepository.save(reservationLog);
+//    }
+
     public void reservation(Long userId, LocalDate date) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
-        // userId와 오늘 날짜로 예약 조회
-        Optional<Reservation> existingReservation = reservationRepository.findByUserIdAndDate(userId, date);
+        Optional<Reservation> existingReservation = reservationRepository.findByUserIdAndDateAndIsCancelFalse(userId, date);
 
-        // 예약이 이미 존재하면 처리
         if (existingReservation.isPresent()) {
             throw new BusinessException(ErrorCode.RESERVATION_ALREADY_EXISTS);
         }
@@ -67,48 +108,62 @@ public class ReservationService {
         Reservation reservation = Reservation.builder()
                 .userId(userId)        // 예약한 사용자 ID
                 .date(date)           // 예약 날짜 (현재 날짜)
+                .isCancel(false)
                 .washingRoom(user.getWashingRoom()) // User 테이블에서 조회한 washingRoom 값 설정
                 .build();
 
-        ReservationLog reservationLog = ReservationLog.builder()
-                .userId(userId)
-                .isCancel(false)
-                .date(LocalDateTime.now())
-                .resDate(date)
-                .washingRoom(user.getWashingRoom())
-                .build();
+//        ReservationLog reservationLog = ReservationLog.builder()
+//                .userId(userId)
+//                .isCancel(false)
+//                .date(LocalDateTime.now())
+//                .resDate(date)
+//                .washingRoom(user.getWashingRoom())
+//                .build();
 
         // 예약을 데이터베이스에 저장
         reservationRepository.save(reservation);
-        reservationLogRepository.save(reservationLog);
+//        reservationLogRepository.save(reservationLog);
     }
 
+
+//    public void cancelReservation(Long userId, LocalDate date) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+//
+//        Optional<Reservation> reservationOpt = reservationRepository.findByUserIdAndDate(userId, date);
+//
+//        // 예약이 존재하면 isCancel을 true로 변경하고 저장
+//        if (reservationOpt.isPresent()) {
+//            Reservation reservation = reservationOpt.get();
+//            // 새로운 예약 생성
+//            ReservationLog reservationLog = ReservationLog.builder()
+//                    .userId(userId)
+//                    .isCancel(true)
+//                    .date(LocalDateTime.now())
+//                    .resDate(date)
+//                    .washingRoom(user.getWashingRoom())
+//                    .build();
+//
+//            reservationRepository.delete(reservation); // 예약 삭제
+//            reservationLogRepository.save(reservationLog);
+//
+//        } else {
+//            throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
+//        }
+//    }
 
     public void cancelReservation(Long userId, LocalDate date) {
-        User user = userRepository.findById(userId)
+        // userId와 date, isCancel이 false인 예약 조회
+        Reservation reservation = reservationRepository.findByUserIdAndDateAndIsCancelFalse(userId, date)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
-        Optional<Reservation> reservationOpt = reservationRepository.findByUserIdAndDate(userId, date);
+        // isCancel을 true로 업데이트
+        reservation.setCancel(true);
 
-        // 예약이 존재하면 isCancel을 true로 변경하고 저장
-        if (reservationOpt.isPresent()) {
-            Reservation reservation = reservationOpt.get();
-            // 새로운 예약 생성
-            ReservationLog reservationLog = ReservationLog.builder()
-                    .userId(userId)
-                    .isCancel(true)
-                    .date(LocalDateTime.now())
-                    .resDate(date)
-                    .washingRoom(user.getWashingRoom())
-                    .build();
-
-            reservationRepository.delete(reservation); // 예약 삭제
-            reservationLogRepository.save(reservationLog);
-
-        } else {
-            throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
-        }
+        // 변경사항을 데이터베이스에 저장
+        reservationRepository.save(reservation);
     }
+
 
     public List<ReservationSummaryResponse> getReservation(Long userId) {
         User user = userRepository.findById(userId)
@@ -199,6 +254,7 @@ public class ReservationService {
 
         return summaryList;
     }
+
     public boolean getIsReserved(Long userId) {
         // 현재 시간 가져오기
         LocalDateTime now = LocalDateTime.now();

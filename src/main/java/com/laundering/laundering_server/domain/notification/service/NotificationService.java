@@ -10,9 +10,11 @@ import com.laundering.laundering_server.domain.notification.model.dto.response.R
 import com.laundering.laundering_server.domain.notification.model.entity.NotifiReservation;
 import com.laundering.laundering_server.domain.notification.repository.NotifiReservationRepository;
 import com.laundering.laundering_server.domain.notification.repository.NotificationRepository;
+import com.laundering.laundering_server.domain.washingMachine.model.entity.Reservation;
 import com.laundering.laundering_server.domain.washingMachine.model.entity.ReservationLog;
 import com.laundering.laundering_server.domain.washingMachine.repository.ReservationLogRepository;
 import com.laundering.laundering_server.domain.notification.model.dto.request.saveNotificationRequest;
+import com.laundering.laundering_server.domain.washingMachine.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,7 @@ public class NotificationService
     private NotificationRepository notificationRepository;
 
     @Autowired
-    private ReservationLogRepository reservationLogRepository;
+    private ReservationRepository reservationRepository;
 
     @Autowired
     private NotifiReservationRepository notifiReservationRepository;
@@ -55,19 +57,37 @@ public class NotificationService
                 .collect(Collectors.toList());
     }
 
+//    public List<ReservationLogResponse> getReservationHistory(Long id) {
+//        // 사용자 정보 조회
+//        User user = userRepository.findById(id)
+//                .orElseThrow(() -> new BusinessException(ErrorCode.UNKNOWN_ERROR));
+//
+//        // 해당 사용자의 예약 기록 조회
+//        List<ReservationLog> reservationLogs = reservationLogRepository.findByUserId(id);
+//
+//        // 예약 기록을 ReservationLogResponse로 변환하면서 washingRoom 추가
+//        return reservationLogs.stream()
+//                .map(log -> new ReservationLogResponse(
+//                        log.getDate().toLocalDate(),       // LocalDateTime에서 LocalDate로 변환
+//                        log.getResDate().toString(),       // LocalDate를 String으로 변환
+//                        log.isCancel(),                   // 취소 여부 전달
+//                        user.getWashingRoom()             // 사용자의 washingRoom 추가
+//                ))
+//                .collect(Collectors.toList());
+//    }
+
     public List<ReservationLogResponse> getReservationHistory(Long id) {
         // 사용자 정보 조회
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.UNKNOWN_ERROR));
 
         // 해당 사용자의 예약 기록 조회
-        List<ReservationLog> reservationLogs = reservationLogRepository.findByUserId(id);
+        List<Reservation> reservation = reservationRepository.findByUserId(id);
 
         // 예약 기록을 ReservationLogResponse로 변환하면서 washingRoom 추가
-        return reservationLogs.stream()
+        return reservation.stream()
                 .map(log -> new ReservationLogResponse(
-                        log.getDate().toLocalDate(),       // LocalDateTime에서 LocalDate로 변환
-                        log.getResDate().toString(),       // LocalDate를 String으로 변환
+                        log.getDate(),       // LocalDate를 String으로 변환
                         log.isCancel(),                   // 취소 여부 전달
                         user.getWashingRoom()             // 사용자의 washingRoom 추가
                 ))
