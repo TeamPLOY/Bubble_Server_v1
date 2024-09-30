@@ -22,4 +22,7 @@ public class UserResponse {
 
     @Schema(description = "기숙사 호실")
     private String roomNum;
+
+    @Schema(description = "세탁실 위치")
+    private String washingRoom;
 }
