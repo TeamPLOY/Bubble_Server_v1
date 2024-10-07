@@ -172,57 +172,20 @@ public class ReservationService {
         String washingRoom = user.getWashingRoom();
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDate startOfCurrentSunday22 = now
-                .with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.SUNDAY))
-                .withHour(22)
-                .withMinute(0)
-                .withSecond(0)
-                .withNano(0)
-                .toLocalDate();  // LocalDate로 변환
-
-        LocalDate endOfCurrentSunday = now
-                .with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.SUNDAY))
-                .withHour(23)
-                .withMinute(59)
-                .withSecond(59)
-                .withNano(999999999)
-                .toLocalDate();  // LocalDate로 변환
+        DayOfWeek today = now.getDayOfWeek();
 
         LocalDate startTime;
         LocalDate endTime;
 
         // 현재 시간이 일요일 22:00~23:59 사이인지 확인
-        if (now.isAfter(startOfCurrentSunday22.atTime(22, 0)) && now.isBefore(endOfCurrentSunday.atTime(23, 59))) {
-            // 다음 주 일요일 22:00 ~ 그다음 주 일요일 21:59 설정
-            startTime = now.with(TemporalAdjusters.next(java.time.DayOfWeek.SUNDAY))
-                    .withHour(22)
-                    .withMinute(0)
-                    .withSecond(0)
-                    .withNano(0)
-                    .toLocalDate();  // LocalDate로 변환
-
-            endTime = now.with(TemporalAdjusters.next(java.time.DayOfWeek.SUNDAY))
-                    .with(TemporalAdjusters.next(java.time.DayOfWeek.SUNDAY))
-                    .withHour(21)
-                    .withMinute(59)
-                    .withSecond(59)
-                    .withNano(999999999)
-                    .toLocalDate();  // LocalDate로 변환
+        if (today == DayOfWeek.SUNDAY && now.getHour() >= 22) {
+            // 다음 주 월요일부터 목요일까지 설정
+            startTime = now.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).toLocalDate();
+            endTime = now.with(TemporalAdjusters.next(DayOfWeek.THURSDAY)).toLocalDate();
         } else {
-            // 전 주 일요일 22:00 ~ 이번 주 일요일 21:59 설정
-            startTime = now.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.SUNDAY))
-                    .withHour(22)
-                    .withMinute(0)
-                    .withSecond(0)
-                    .withNano(0)
-                    .toLocalDate();  // LocalDate로 변환
-
-            endTime = now.with(TemporalAdjusters.next(java.time.DayOfWeek.SUNDAY))
-                    .withHour(21)
-                    .withMinute(59)
-                    .withSecond(59)
-                    .withNano(999999999)
-                    .toLocalDate();  // LocalDate로 변환
+            // 이번 주 월요일부터 목요일까지 설정
+            startTime = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).toLocalDate();
+            endTime = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.THURSDAY)).toLocalDate();
         }
 
         // 예약 기록 조회
@@ -240,20 +203,21 @@ public class ReservationService {
         // 날짜별 유저 수 매핑
         Map<LocalDate, Long> reservationCountMap = reservations.stream()
                 .collect(Collectors.groupingBy(
-                        Reservation::getDate,  // getDate()를 그대로 사용
-                        Collectors.counting()  // 유저 수 카운팅
+                        Reservation::getDate,
+                        Collectors.counting()
                 ));
 
         // 월요일부터 목요일에 대해서만 userCount를 0으로 설정, 예약이 있으면 해당 유저 수로 덮어쓰기
         List<ReservationSummaryResponse> summaryList = allWeekdays.stream()
                 .map(date -> new ReservationSummaryResponse(
                         date,
-                        date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN),  // 요일 추가
-                        reservationCountMap.getOrDefault(date, 0L)))  // 예약이 없으면 0, 있으면 실제 유저 수
+                        date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN),
+                        reservationCountMap.getOrDefault(date, 0L)))
                 .collect(Collectors.toList());
 
         return summaryList;
     }
+
 
     public boolean getIsReserved(Long userId) {
         // 현재 시간 가져오기
