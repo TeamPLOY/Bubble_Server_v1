@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "세탁기")
+@Tag(name = "예약")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
