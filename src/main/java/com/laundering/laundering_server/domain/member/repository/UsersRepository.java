@@ -1,17 +1,17 @@
 package com.laundering.laundering_server.domain.member.repository;
 
 
-import com.laundering.laundering_server.domain.member.model.entity.User;
+import com.laundering.laundering_server.domain.member.model.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User>
+public interface UsersRepository extends JpaRepository<Users, Long>, JpaSpecificationExecutor<Users>
 {
-    Optional<User> findByRefreshToken(String refreshToken);
+    Optional<Users> findByRefreshToken(String refreshToken);
 
-    Optional<User> findByEmail(String email);
+    Optional<Users> findByEmail(String email);
 
     boolean existsByEmail(String email);
 }

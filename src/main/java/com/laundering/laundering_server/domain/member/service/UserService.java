@@ -4,11 +4,12 @@ import com.laundering.laundering_server.common.exception.BusinessException;
 import com.laundering.laundering_server.common.exception.ErrorCode;
 import com.laundering.laundering_server.domain.member.model.dto.request.SignUpRequest;
 import com.laundering.laundering_server.domain.member.model.dto.response.UserResponse;
-import com.laundering.laundering_server.domain.member.model.entity.User;
+import com.laundering.laundering_server.domain.member.model.entity.Users;
 import com.laundering.laundering_server.domain.member.model.vo.WashingRoom;
-import com.laundering.laundering_server.domain.member.repository.UserRepository;
+import com.laundering.laundering_server.domain.member.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,14 +20,14 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
+    private final UsersRepository usersRepository;
 
     @Transactional
     public void create(SignUpRequest req) {
         try {
 
             // 이메일 중복 여부 확인
-            if (userRepository.existsByEmail(req.email())) {
+            if (usersRepository.existsByEmail(req.email())) {
                 throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS);
             }
 
@@ -37,7 +38,7 @@ public class UserService {
             // Enum을 이용해 washingRoom 값 결정
             String washingRoom = WashingRoom.findWashingRoom(prefix, roomNumber);
 
-            userRepository.save(User.builder()
+            usersRepository.save(Users.builder()
                     .email(req.email()) // 사용자 아이디
                     .password(new BCryptPasswordEncoder().encode(req.password())) // 비밀번호
                     .name(req.name())
@@ -53,7 +54,7 @@ public class UserService {
     }
 
     public UserResponse getUserInfo(Long memberId) {
-        User user = userRepository.findById(memberId)
+        Users user = usersRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.UNKNOWN_ERROR));
 
         return UserResponse.builder()
@@ -66,12 +67,22 @@ public class UserService {
     }
 
     public void deleteUser(Long memberId) {
-        Optional<User> userOptional = userRepository.findById(memberId);
+        Optional<Users> userOptional = usersRepository.findById(memberId);
 
         if (userOptional.isPresent()) {
-            userRepository.delete(userOptional.get());
+            usersRepository.delete(userOptional.get());
         } else {
             throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
         }
+    }
+
+    public String getwashingRoom(Long memberId) {
+        Users user = usersRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.UNAUTHORIZED));
+
+        String washingRoom = user.getWashingRoom();
+
+        return washingRoom;
+
     }
 }
