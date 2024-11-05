@@ -1,57 +1,88 @@
 package com.laundering.laundering_server.domain.washingMachine.service;
 
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laundering.laundering_server.common.exception.BusinessException;
 import com.laundering.laundering_server.common.exception.ErrorCode;
-import com.laundering.laundering_server.domain.member.repository.UsersRepository;
-import com.laundering.laundering_server.domain.member.model.entity.Users;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.response.WashingMachineResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class WashingMachineService
-{
-    @Autowired
-    private UsersRepository usersRepository;
+public class WashingMachineStatusService {
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private static final String REDIS_KEY_PREFIX = "washingMachineStatus:";
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    public List<WashingMachineResponse> getStatus(Long id) {
+    public List<WashingMachineResponse> getStatus() {
         try {
-            // 주어진 id로 사용자 정보를 조회
-            Users user = usersRepository.findById(id)
-                    .orElseThrow(() -> new BusinessException(ErrorCode.UNAUTHORIZED));
-
-            // 세탁실 정보 가져오기
-            String washingRoom = user.getWashingRoom();
-
-            // URL을 구성하고 HTTP GET 요청 보내기
-            String url = String.format("https://build-bubble-proxy-server.vercel.app/home/%s", washingRoom);
+            String url = "https://build-bubble-proxy-server.vercel.app/home";
             String response = restTemplate.getForObject(url, String.class);
-
-            // JSON 응답을 WashingMachineResponse 리스트로 변환하기
-            return objectMapper.readValue(response, new TypeReference<List<WashingMachineResponse>>() {});
+            List<WashingMachineResponse> statusList = objectMapper.readValue(response, new TypeReference<List<WashingMachineResponse>>() {});
+            saveAllStatusToRedis(statusList);
+            return statusList;
         } catch (IOException e) {
-            // JSON 처리 중 오류가 발생한 경우 또는 IO 오류가 발생한 경우 처리
+            log.error("세탁기 API 응답 파싱에 실패했습니다: {}", e.getMessage());
             throw new BusinessException(ErrorCode.BAD_REQUEST);
         }
     }
+
+    public List<WashingMachineResponse> getAllStatusFromRedis() {
+        String redisKey = REDIS_KEY_PREFIX + "all";
+        String jsonStatusList = redisTemplate.opsForValue().get(redisKey);
+        if (jsonStatusList != null) {
+            try {
+                return objectMapper.readValue(jsonStatusList, new TypeReference<List<WashingMachineResponse>>() {});
+            } catch (IOException e) {
+                log.error("Redis에서 JSON 파싱에 실패했습니다: {}", e.getMessage());
+            }
+        }
+        return null;
+    }
+
+    public void saveAllStatusToRedis(List<WashingMachineResponse> statusList) {
+        String redisKey = REDIS_KEY_PREFIX + "all";
+        try {
+            String jsonStatusList = objectMapper.writeValueAsString(statusList);
+            redisTemplate.opsForValue().set(redisKey, jsonStatusList);
+            log.info("전체 세탁기 상태가 Redis에 저장되었습니다: 키={}, 값={}", redisKey, jsonStatusList);
+        } catch (IOException e) {
+            log.error("상태 리스트를 JSON으로 변환하는 데 실패했습니다: {}", e.getMessage());
+        }
+    }
+
+    public List<WashingMachineResponse> getStatusFromRedis(String washingRoom) {
+        String redisKey = REDIS_KEY_PREFIX + "all";
+        String jsonStatusList = redisTemplate.opsForValue().get(redisKey);
+
+        if (jsonStatusList != null) {
+            try {
+                // 전체 리스트를 파싱
+                List<WashingMachineResponse> statusList = objectMapper.readValue(jsonStatusList, new TypeReference<List<WashingMachineResponse>>() {});
+
+                // washingRoom 값과 일치하는 name 필터링
+                List<WashingMachineResponse> filteredList = statusList.stream()
+                        .filter(status -> status.name().startsWith(washingRoom + " "))
+                        .collect(Collectors.toList());
+
+                return filteredList;
+            } catch (IOException e) {
+                log.error("Redis에서 JSON 파싱에 실패했습니다: {}", e.getMessage());
+            }
+        }
+        return null;
+    }
+
 }
-
-
