@@ -2,11 +2,10 @@ package com.laundering.laundering_server.domain.washingMachine.service;
 
 import com.laundering.laundering_server.common.exception.BusinessException;
 import com.laundering.laundering_server.common.exception.ErrorCode;
-import com.laundering.laundering_server.domain.member.model.entity.User;
-import com.laundering.laundering_server.domain.member.repository.UserRepository;
+import com.laundering.laundering_server.domain.member.model.entity.Users;
+import com.laundering.laundering_server.domain.member.repository.UsersRepository;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.response.ReservationSummaryResponse;
 import com.laundering.laundering_server.domain.washingMachine.model.entity.Reservation;
-import com.laundering.laundering_server.domain.washingMachine.model.entity.ReservationLog;
 import com.laundering.laundering_server.domain.washingMachine.repository.ReservationLogRepository;
 import com.laundering.laundering_server.domain.washingMachine.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +37,7 @@ public class ReservationService {
     private ReservationRepository reservationRepository;
 
     @Autowired
-    private final UserRepository userRepository;
+    private final UsersRepository usersRepository;
 
 //    public void reservation(Long userId, LocalDate date) {
 //        User user = userRepository.findById(userId)
@@ -84,7 +83,7 @@ public class ReservationService {
 //    }
 
     public void reservation(Long userId, LocalDate date) {
-        User user = userRepository.findById(userId)
+        Users user = usersRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
         Optional<Reservation> existingReservation = reservationRepository.findByUserIdAndDateAndIsCancelFalse(userId, date);
@@ -166,7 +165,7 @@ public class ReservationService {
 
 
     public List<ReservationSummaryResponse> getReservation(Long userId) {
-        User user = userRepository.findById(userId)
+        Users user = usersRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
         String washingRoom = user.getWashingRoom();

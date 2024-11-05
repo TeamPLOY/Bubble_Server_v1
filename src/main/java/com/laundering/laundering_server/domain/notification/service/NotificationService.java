@@ -2,8 +2,8 @@ package com.laundering.laundering_server.domain.notification.service;
 
 import com.laundering.laundering_server.common.exception.BusinessException;
 import com.laundering.laundering_server.common.exception.ErrorCode;
-import com.laundering.laundering_server.domain.member.model.entity.User;
-import com.laundering.laundering_server.domain.member.repository.UserRepository;
+import com.laundering.laundering_server.domain.member.model.entity.Users;
+import com.laundering.laundering_server.domain.member.repository.UsersRepository;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationDetailResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.ReservationLogResponse;
@@ -11,8 +11,6 @@ import com.laundering.laundering_server.domain.notification.model.entity.NotifiR
 import com.laundering.laundering_server.domain.notification.repository.NotifiReservationRepository;
 import com.laundering.laundering_server.domain.notification.repository.NotificationRepository;
 import com.laundering.laundering_server.domain.washingMachine.model.entity.Reservation;
-import com.laundering.laundering_server.domain.washingMachine.model.entity.ReservationLog;
-import com.laundering.laundering_server.domain.washingMachine.repository.ReservationLogRepository;
 import com.laundering.laundering_server.domain.notification.model.dto.request.saveNotificationRequest;
 import com.laundering.laundering_server.domain.washingMachine.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +39,7 @@ public class NotificationService
     private NotifiReservationRepository notifiReservationRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UsersRepository usersRepository;
 
     public List<NotificationResponse> getNotification() {
         return notificationRepository.findAll().stream()
@@ -78,7 +76,7 @@ public class NotificationService
 
     public List<ReservationLogResponse> getReservationHistory(Long id) {
         // 사용자 정보 조회
-        User user = userRepository.findById(id)
+        Users user = usersRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.UNKNOWN_ERROR));
 
         // 해당 사용자의 예약 기록 조회
