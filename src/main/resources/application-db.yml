@@ -5,9 +5,9 @@
 
     datasource:
       driver-class-name: org.postgresql.Driver
-      url: ${DB_URL}
-      username: ${DB_USERNAME}
-      password: ${DB_PASSWORD}
+      url: jdbc:postgresql://bubble-postgresql.c92ysymsuqx8.ap-northeast-2.rds.amazonaws.com:5432/bubble
+      username: master
+      password: bubbledb1!
 
     jpa:
       database: postgresql  # JPA가 사용할 데이터베이스를 MySQL로 설정
@@ -17,5 +17,5 @@
 
     redis:
       connection:
-        host: ${REDIS_HOST:localhost}  # Redis 서버 호스트 (기본값: localhost)
-        port: ${REDIS_PORT:6379}        # Redis 서버 포트 (기본값: 6379)
+        host: localhost
+        port: 6379
