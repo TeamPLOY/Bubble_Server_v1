@@ -6,6 +6,7 @@ import com.laundering.laundering_server.domain.member.model.dto.request.*;
 import com.laundering.laundering_server.domain.member.model.dto.response.LoginResponse;
 import com.laundering.laundering_server.domain.member.model.dto.response.TokenResponse;
 import com.laundering.laundering_server.domain.member.model.dto.response.UserResponse;
+import com.laundering.laundering_server.domain.member.model.dto.request.DeleteRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static com.laundering.laundering_server.common.util.AuthenticationUtil.getMemberId;
@@ -64,8 +64,8 @@ public class AuthController
 
     @Operation(summary = "회원 탈퇴")
     @DeleteMapping("/user")
-    public ResponseEntity<Void> deleteUser(){
-        authenticationFacade.deleteUser(getMemberId());
+    public ResponseEntity<Void> deleteUser(@RequestBody DeleteRequest req){
+        authenticationFacade.deleteUser(req);
         return ResponseEntity.noContent().build();
     }
 }

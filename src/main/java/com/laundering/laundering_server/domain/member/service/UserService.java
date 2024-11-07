@@ -66,13 +66,21 @@ public class UserService {
                 .build();
     }
 
-    public void deleteUser(Long memberId) {
-        Optional<Users> userOptional = usersRepository.findById(memberId);
+    public void deleteUser(String email, String password) {
+        Optional<Users> userOptional = usersRepository.findByEmail(email);
 
         if (userOptional.isPresent()) {
-            usersRepository.delete(userOptional.get());
+            Users user = userOptional.get();
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+            // 입력된 비밀번호와 저장된 해시 비밀번호 비교
+            if (passwordEncoder.matches(password, user.getPassword())) {
+                usersRepository.delete(user);
+            } else {
+                throw new BusinessException(ErrorCode.INVALID_PASSWORD); // 비밀번호가 일치하지 않으면 오류 발생
+            }
         } else {
-            throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
+            throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND); // 사용자 존재하지 않으면 오류 발생
         }
     }
 
