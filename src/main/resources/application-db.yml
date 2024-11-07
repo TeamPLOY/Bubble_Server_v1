@@ -17,5 +17,5 @@
 
     redis:
       connection:
-        host: ${REDIS_HOST:localhost}  # Redis 서버 호스트 (기본값: localhost)
-        port: ${REDIS_PORT:6379}        # Redis 서버 포트 (기본값: 6379)
+        host: ${REDIS_HOST}  # Redis 서버 호스트 (기본값: localhost)
+        port: ${REDIS_PORT}        # Redis 서버 포트 (기본값: 6379)
