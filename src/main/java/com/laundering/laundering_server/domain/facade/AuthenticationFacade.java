@@ -40,8 +40,8 @@ public class AuthenticationFacade {
         return userService.getUserInfo(memberId);
     }
     @Transactional
-    public void deleteUser(Long memberId) {
-        userService.deleteUser(memberId);
+    public void deleteUser(DeleteRequest req) {
+        userService.deleteUser(req.email(),req.password());
     }
 
     @Transactional
