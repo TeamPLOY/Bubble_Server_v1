@@ -106,7 +106,7 @@ public class ReservationService {
         }
 
         // 예약 기록 조회
-        List<Reservation> reservations = reservationRepository.findByWashingRoomAndDateBetween(washingRoom, startTime, endTime);
+        List<Reservation> reservations = reservationRepository.findByWashingRoomAndDateBetweenAndIsCancelFalse(washingRoom, startTime, endTime);
 
         // 월요일부터 목요일에 해당하는 날짜만 필터링
         List<LocalDate> allWeekdays = startTime.datesUntil(endTime.plusDays(1))
@@ -161,7 +161,7 @@ public class ReservationService {
         }
 
         // 해당 기간 동안 userId로 예약된 내역이 있는지 조회
-        List<Reservation> reservations = reservationRepository.findByUserIdAndDateBetween(userId, startDate, endDate);
+        List<Reservation> reservations = reservationRepository.findByUserIdAndDateBetweenAndIsCancelFalse(userId, startDate, endDate);
 
         // 예약 내역이 존재하면 true 반환
         return !reservations.isEmpty();

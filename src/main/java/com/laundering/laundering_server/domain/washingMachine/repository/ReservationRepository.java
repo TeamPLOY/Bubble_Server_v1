@@ -17,4 +17,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByUserId(Long userId);
     Optional<Reservation> findByUserIdAndDateAndIsCancelFalse(Long userId, LocalDate date);
 
+    List<Reservation> findByUserIdAndDateBetweenAndIsCancelFalse(Long userId, LocalDate startDate, LocalDate endDate);
+
+    List<Reservation> findByWashingRoomAndDateBetweenAndIsCancelFalse(String washingRoom, LocalDate startDate, LocalDate endDate);
+
 }
