@@ -1,4 +1,5 @@
-server.port : 5000  # ??? 5000? ???? ??
+server:
+  port: 5000
 
 spring:
   config:
@@ -6,6 +7,9 @@ spring:
       - application-db.yml
       - application-security.yml
       - application-email.yml
+
+  jackson:
+    time-zone: Asia/Seoul  # 시간대 설정 추가
 
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
