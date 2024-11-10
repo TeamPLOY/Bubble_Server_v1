@@ -31,56 +31,10 @@ import java.util.stream.Collectors;
 public class ReservationService {
 
     @Autowired
-    private ReservationLogRepository reservationLogRepository;
-
-    @Autowired
     private ReservationRepository reservationRepository;
 
     @Autowired
     private final UsersRepository usersRepository;
-
-//    public void reservation(Long userId, LocalDate date) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
-//
-//        // userId와 오늘 날짜로 예약 조회
-//        Optional<Reservation> existingReservation = reservationRepository.findByUserIdAndDate(userId, date);
-//
-//        // 예약이 이미 존재하면 처리
-//        if (existingReservation.isPresent()) {
-//            throw new BusinessException(ErrorCode.RESERVATION_ALREADY_EXISTS);
-//        }
-//
-//        // 주 시작일과 끝일 계산 (예: 일요일 시작, 토요일 끝)
-//        LocalDate startOfWeek = date.with(DayOfWeek.SUNDAY);
-//        LocalDate endOfWeek = date.with(DayOfWeek.SATURDAY);
-//
-//        // 해당 주에 예약이 있는지 확인
-//        List<Reservation> weeklyReservations = reservationRepository.findByUserIdAndDateBetween(userId, startOfWeek, endOfWeek);
-//
-//        if (!weeklyReservations.isEmpty()) {
-//            throw new BusinessException(ErrorCode.RESERVATION_ALREADY_EXISTS_THIS_WEEK);
-//        }
-//
-//        // 새로운 예약 생성
-//        Reservation reservation = Reservation.builder()
-//                .userId(userId)        // 예약한 사용자 ID
-//                .date(date)           // 예약 날짜 (현재 날짜)
-//                .washingRoom(user.getWashingRoom()) // User 테이블에서 조회한 washingRoom 값 설정
-//                .build();
-//
-//        ReservationLog reservationLog = ReservationLog.builder()
-//                .userId(userId)
-//                .isCancel(false)
-//                .date(LocalDateTime.now())
-//                .resDate(date)
-//                .washingRoom(user.getWashingRoom())
-//                .build();
-//
-//        // 예약을 데이터베이스에 저장
-//        reservationRepository.save(reservation);
-//        reservationLogRepository.save(reservationLog);
-//    }
 
     public void reservation(Long userId, LocalDate date) {
         Users user = usersRepository.findById(userId)
@@ -111,45 +65,9 @@ public class ReservationService {
                 .washingRoom(user.getWashingRoom()) // User 테이블에서 조회한 washingRoom 값 설정
                 .build();
 
-//        ReservationLog reservationLog = ReservationLog.builder()
-//                .userId(userId)
-//                .isCancel(false)
-//                .date(LocalDateTime.now())
-//                .resDate(date)
-//                .washingRoom(user.getWashingRoom())
-//                .build();
-
         // 예약을 데이터베이스에 저장
         reservationRepository.save(reservation);
-//        reservationLogRepository.save(reservationLog);
     }
-
-
-//    public void cancelReservation(Long userId, LocalDate date) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
-//
-//        Optional<Reservation> reservationOpt = reservationRepository.findByUserIdAndDate(userId, date);
-//
-//        // 예약이 존재하면 isCancel을 true로 변경하고 저장
-//        if (reservationOpt.isPresent()) {
-//            Reservation reservation = reservationOpt.get();
-//            // 새로운 예약 생성
-//            ReservationLog reservationLog = ReservationLog.builder()
-//                    .userId(userId)
-//                    .isCancel(true)
-//                    .date(LocalDateTime.now())
-//                    .resDate(date)
-//                    .washingRoom(user.getWashingRoom())
-//                    .build();
-//
-//            reservationRepository.delete(reservation); // 예약 삭제
-//            reservationLogRepository.save(reservationLog);
-//
-//        } else {
-//            throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
-//        }
-//    }
 
     public void cancelReservation(Long userId, LocalDate date) {
         // userId와 date, isCancel이 false인 예약 조회
@@ -180,11 +98,11 @@ public class ReservationService {
         if (today == DayOfWeek.SUNDAY && now.getHour() >= 22) {
             // 다음 주 월요일부터 목요일까지 설정
             startTime = now.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).toLocalDate();
-            endTime = now.with(TemporalAdjusters.next(DayOfWeek.THURSDAY)).toLocalDate();
+            endTime = startTime.plusDays(3); // 월요일부터 목요일까지
         } else {
             // 이번 주 월요일부터 목요일까지 설정
             startTime = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).toLocalDate();
-            endTime = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.THURSDAY)).toLocalDate();
+            endTime = startTime.plusDays(3); // 월요일부터 목요일까지
         }
 
         // 예약 기록 조회
