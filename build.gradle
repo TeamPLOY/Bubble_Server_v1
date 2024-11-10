@@ -47,6 +47,7 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j:8.2.0'
 
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'javax.servlet:javax.servlet-api:4.0.1'
 }
 
 tasks.named('test') {
