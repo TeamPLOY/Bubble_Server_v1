@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,9 +73,22 @@ public class WashingMachineStatusService {
                 // 전체 리스트를 파싱
                 List<WashingMachineResponse> statusList = objectMapper.readValue(jsonStatusList, new TypeReference<List<WashingMachineResponse>>() {});
 
-                // washingRoom 값과 일치하는 name 필터링
+                // washingRoom 값과 일치하는 name 필터링 및 정렬
                 List<WashingMachineResponse> filteredList = statusList.stream()
                         .filter(status -> status.name().startsWith(washingRoom + " "))
+                        .sorted(Comparator.comparing((WashingMachineResponse status) -> {
+                            String name = status.name();
+                            if (name.contains("세탁기")) {
+                                return 0; // 세탁기 먼저
+                            } else {
+                                return 1; // 건조기 나중
+                            }
+                        }).thenComparing(status -> {
+                            // 숫자 부분만 추출하여 정렬
+                            String name = status.name();
+                            String number = name.replaceAll("[^0-9]", "");
+                            return Integer.parseInt(number);
+                        }))
                         .collect(Collectors.toList());
 
                 return filteredList;
@@ -84,5 +98,6 @@ public class WashingMachineStatusService {
         }
         return null;
     }
+
 
 }
