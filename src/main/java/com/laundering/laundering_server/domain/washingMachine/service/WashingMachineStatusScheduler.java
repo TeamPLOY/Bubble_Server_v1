@@ -36,7 +36,7 @@ public class WashingMachineStatusScheduler {
 
         // 3. 남은 시간이 1분인 세탁기 필터링
         List<WashingMachineResponse> machinesAboutToFinish = statusList.stream()
-                .filter(machine -> machine.time() == 1.0)
+                .filter(machine -> machine.time() == 0.0)
                 .collect(Collectors.toList());
 
         // 4. 예약된 알림 조회 및 FCM 알림 전송

@@ -18,7 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FirebaseService {
 
-    private final String serviceAccountKeyFile = "/Users/hantaeyeongmac/bubble-457b0-firebase-adminsdk-a39g3-6865a12748.json"; // 서비스 계정 키 파일 경로
+    private final String serviceAccountKeyFile = "/Users/hantaeyeongmac/bubble-457b0-firebase-adminsdk-a39g3-34a394f7a4.json"; // 서비스 계정 키 파일 경로
 
     // 액세스 토큰을 발급받는 메서드
     public String getAccessToken() throws IOException {
@@ -33,8 +33,8 @@ public class FirebaseService {
 
     // FCM 알림을 전송하는 메서드
     public void sendFcmNotification(String token, String machineName) {
-        String title = "세탁기 알림";
-        String body = "세탁기 " + machineName + "의 작업이 곧 완료됩니다.";
+        String title = "버블 알림";
+        String body = "세탁실 " + machineName + "가 곧 완료됩니다.";
 
         // FCM 요청 헤더 설정
         HttpHeaders headers = new HttpHeaders();
