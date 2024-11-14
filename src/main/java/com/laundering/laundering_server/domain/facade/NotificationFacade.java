@@ -35,9 +35,4 @@ public class NotificationFacade {
     public void saveNotification(saveNotificationRequest request, Long id) {
         notificationService.saveNotification(request,id);
     }
-
-    @Transactional
-    public boolean getResNotification(saveNotificationRequest request, Long id) {
-        return notificationService.getResNotification(request,id);
-    }
 }

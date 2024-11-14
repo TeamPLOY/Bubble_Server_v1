@@ -51,12 +51,4 @@ public class NotificationController {
         notificationFacade.saveNotification(saveNotificationRequest,getMemberId());
         return ResponseEntity.noContent().build();
     }
-
-    @Operation(summary = "알림 조회")
-    @PostMapping("/check")
-    public ResponseEntity<Boolean> getResNotification(
-            saveNotificationRequest saveNotificationRequest
-    ){
-        return ResponseEntity.ok(notificationFacade.getResNotification(saveNotificationRequest,getMemberId()));
-    }
 }
