@@ -18,8 +18,7 @@ public class NotifiReservation {
 
     private Long userId;
 
+    private String token;
+
     private String machine;
-
-    private LocalDate date;
-
 }
