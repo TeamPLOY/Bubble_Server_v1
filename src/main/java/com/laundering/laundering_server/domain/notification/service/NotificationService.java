@@ -19,8 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -82,13 +85,20 @@ public class NotificationService
         // 해당 사용자의 예약 기록 조회
         List<Reservation> reservation = reservationRepository.findByUserId(id);
 
-        // 예약 기록을 ReservationLogResponse로 변환하면서 washingRoom 추가
+        // 예약 기록을 ReservationLogResponse로 변환하면서 washingRoom과 요일 추가
         return reservation.stream()
-                .map(log -> new ReservationLogResponse(
-                        log.getDate(),       // LocalDate를 String으로 변환
-                        log.isCancel(),                   // 취소 여부 전달
-                        user.getWashingRoom()             // 사용자의 washingRoom 추가
-                ))
+                .map(log -> {
+                    // 날짜에서 요일을 추출
+                    DayOfWeek dayOfWeek = log.getDate().getDayOfWeek();
+                    String dayOfWeekStr = dayOfWeek.getDisplayName(TextStyle.FULL, Locale.KOREAN); // 요일을 한글로 반환
+
+                    return new ReservationLogResponse(
+                            log.getDate(),       // LocalDate를 String으로 변환
+                            log.isCancel(),      // 취소 여부 전달
+                            user.getWashingRoom(), // 사용자의 washingRoom 추가
+                            dayOfWeekStr        // 요일 정보 추가
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
