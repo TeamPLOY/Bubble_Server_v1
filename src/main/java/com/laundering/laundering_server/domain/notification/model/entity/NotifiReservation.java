@@ -3,8 +3,6 @@ package com.laundering.laundering_server.domain.notification.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
-
 @Entity
 @Getter
 @Setter
@@ -21,4 +19,8 @@ public class NotifiReservation {
     private String token;
 
     private String machine;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean sent = false; // 알림 전송 여부 (기본값 false)
 }
