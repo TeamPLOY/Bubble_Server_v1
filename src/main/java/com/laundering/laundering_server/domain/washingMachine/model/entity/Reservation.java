@@ -18,9 +18,11 @@ public class Reservation {
 
     private Long userId;
 
-    private boolean isCancel;
+    private boolean cancel;
 
     private LocalDate date;
 
     private String washingRoom;
+
+    private String machine;
 }
