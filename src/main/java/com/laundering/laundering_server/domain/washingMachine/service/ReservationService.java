@@ -20,10 +20,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.time.temporal.TemporalAdjusters;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -120,22 +119,52 @@ public class ReservationService {
                 })
                 .collect(Collectors.toList());
 
-        // 날짜별 유저 수 매핑
-        Map<LocalDate, Long> reservationCountMap = reservations.stream()
+        // 세탁기 예약 상태에 대한 맵핑
+        Map<LocalDate, Set<Integer>> reservationMap = reservations.stream()
                 .collect(Collectors.groupingBy(
                         Reservation::getDate,
-                        Collectors.counting()
+                        Collectors.mapping(this::extractMachineId, Collectors.toSet())
                 ));
 
-        // 월요일부터 목요일에 대해서만 userCount를 0으로 설정, 예약이 있으면 해당 유저 수로 덮어쓰기
+        // 월요일부터 목요일에 대해서만 세탁기 예약 상태를 배열로 설정
         List<ReservationSummaryResponse> summaryList = allWeekdays.stream()
-                .map(date -> new ReservationSummaryResponse(
-                        date,
-                        date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN),
-                        reservationCountMap.getOrDefault(date, 0L)))
+                .map(date -> {
+                    // 기본적으로 예약이 없는 세탁기 배열 (예시로 세탁기 1, 2, 3, 4 존재)
+                    boolean[] washingMachinesReserved = new boolean[4]; // 4개의 세탁기 (index 0: 세탁기1, index 1: 세탁기2, ...)
+
+                    Set<Integer> reservedMachines = reservationMap.getOrDefault(date, Collections.emptySet());
+
+                    // 예약된 세탁기 번호를 true로 설정
+                    for (Integer machineId : reservedMachines) {
+                        if (machineId >= 1 && machineId <= 4) {
+                            washingMachinesReserved[machineId - 1] = true;
+                        }
+                    }
+
+                    return new ReservationSummaryResponse(
+                            date,
+                            date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN),
+                            washingMachinesReserved
+                    );
+                })
                 .collect(Collectors.toList());
 
         return summaryList;
+    }
+
+    // 세탁기 이름에서 ID 추출
+    private Integer extractMachineId(Reservation reservation) {
+        String machine = reservation.getMachine();
+
+        // 정규 표현식으로 "세탁기" 뒤에 오는 숫자 추출 (예: "세탁기2" -> 2)
+        Pattern pattern = Pattern.compile("세탁기(\\d+)");
+        Matcher matcher = pattern.matcher(machine);
+
+        if (matcher.find()) {
+            return Integer.parseInt(matcher.group(1)); // 추출된 숫자 반환
+        } else {
+            return -1; // "세탁기" 번호가 없으면 -1 반환
+        }
     }
 
 
