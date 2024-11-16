@@ -4,9 +4,10 @@ import com.laundering.laundering_server.common.exception.BusinessException;
 import com.laundering.laundering_server.common.exception.ErrorCode;
 import com.laundering.laundering_server.domain.member.model.entity.Users;
 import com.laundering.laundering_server.domain.member.repository.UsersRepository;
+import com.laundering.laundering_server.domain.notification.model.entity.NotifiReservation;
+import com.laundering.laundering_server.domain.notification.repository.NotifiReservationRepository;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.response.ReservationSummaryResponse;
 import com.laundering.laundering_server.domain.washingMachine.model.entity.Reservation;
-import com.laundering.laundering_server.domain.washingMachine.repository.ReservationLogRepository;
 import com.laundering.laundering_server.domain.washingMachine.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,12 +37,16 @@ public class ReservationService {
     @Autowired
     private final UsersRepository usersRepository;
 
-    public void reservation(Long userId, LocalDate date) {
+    @Autowired
+    private final NotifiReservationRepository notifiReservationRepository;
+
+    public void reservation(Long userId, LocalDate date, String machine) {
+        // 사용자 조회
         Users user = usersRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
-        Optional<Reservation> existingReservation = reservationRepository.findByUserIdAndDateAndIsCancelFalse(userId, date);
-
+        // 동일 날짜에 이미 예약이 있는지 확인
+        Optional<Reservation> existingReservation = reservationRepository.findByUserIdAndDateAndCancelFalse(userId, date);
         if (existingReservation.isPresent()) {
             throw new BusinessException(ErrorCode.RESERVATION_ALREADY_EXISTS);
         }
@@ -52,26 +57,24 @@ public class ReservationService {
 
         // 해당 주에 예약이 있는지 확인
         List<Reservation> weeklyReservations = reservationRepository.findByUserIdAndDateBetween(userId, startOfWeek, endOfWeek);
-
         if (!weeklyReservations.isEmpty()) {
             throw new BusinessException(ErrorCode.RESERVATION_ALREADY_EXISTS_THIS_WEEK);
         }
 
         // 새로운 예약 생성
-        Reservation reservation = Reservation.builder()
+        reservationRepository.save(Reservation.builder()
                 .userId(userId)        // 예약한 사용자 ID
                 .date(date)           // 예약 날짜 (현재 날짜)
-                .isCancel(false)
+                .cancel(false)
                 .washingRoom(user.getWashingRoom()) // User 테이블에서 조회한 washingRoom 값 설정
-                .build();
-
-        // 예약을 데이터베이스에 저장
-        reservationRepository.save(reservation);
+                .machine(machine)
+                .build()
+        );
     }
 
     public void cancelReservation(Long userId, LocalDate date) {
         // userId와 date, isCancel이 false인 예약 조회
-        Reservation reservation = reservationRepository.findByUserIdAndDateAndIsCancelFalse(userId, date)
+        Reservation reservation = reservationRepository.findByUserIdAndDateAndCancelFalse(userId, date)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
         // isCancel을 true로 업데이트
@@ -106,7 +109,7 @@ public class ReservationService {
         }
 
         // 예약 기록 조회
-        List<Reservation> reservations = reservationRepository.findByWashingRoomAndDateBetweenAndIsCancelFalse(washingRoom, startTime, endTime);
+        List<Reservation> reservations = reservationRepository.findByWashingRoomAndDateBetweenAndCancelFalse(washingRoom, startTime, endTime);
 
         // 월요일부터 목요일에 해당하는 날짜만 필터링
         List<LocalDate> allWeekdays = startTime.datesUntil(endTime.plusDays(1))
@@ -161,7 +164,7 @@ public class ReservationService {
         }
 
         // 해당 기간 동안 userId로 예약된 내역이 있는지 조회
-        List<Reservation> reservations = reservationRepository.findByUserIdAndDateBetweenAndIsCancelFalse(userId, startDate, endDate);
+        List<Reservation> reservations = reservationRepository.findByUserIdAndDateBetweenAndCancelFalse(userId, startDate, endDate);
 
         // 예약 내역이 존재하면 true 반환
         return !reservations.isEmpty();
