@@ -1,6 +1,7 @@
 package com.laundering.laundering_server.domain.facade;
 
 import com.laundering.laundering_server.domain.member.service.UserService;
+import com.laundering.laundering_server.domain.washingMachine.model.dto.request.ReservationRequest;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.response.ReservationSummaryResponse;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.response.WashingMachineResponse;
 import com.laundering.laundering_server.domain.washingMachine.service.ReservationService;
@@ -25,8 +26,8 @@ public class WashingMachineFacade {
     }
 
     @Transactional
-    public void reservation(Long id, LocalDate date) {
-        reservationService.reservation(id,date);
+    public void reservation(Long id, ReservationRequest req) {
+        reservationService.reservation(id,req.date(),req.machine());
     }
 
     @Transactional

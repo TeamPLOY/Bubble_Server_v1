@@ -35,7 +35,7 @@ public class WashingMachineController {
     public ResponseEntity<Void> reservation(
             @RequestBody ReservationRequest reservationRequest
     ) {
-        washingMachineFacade.reservation(getMemberId(),reservationRequest.date());
+        washingMachineFacade.reservation(getMemberId(),reservationRequest);
         return ResponseEntity.noContent().build();
     }
 
