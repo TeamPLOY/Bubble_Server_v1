@@ -14,5 +14,7 @@ public interface UsersRepository extends JpaRepository<Users, Long>, JpaSpecific
     Optional<Users> findByEmail(String email);
 
     boolean existsByEmail(String email);
+
+    Users findWashingRoomById(Long userId);
 }
 

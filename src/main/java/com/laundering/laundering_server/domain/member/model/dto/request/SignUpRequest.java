@@ -9,6 +9,8 @@ public record SignUpRequest(
 
     int stuNum,
 
-    String roomNum
+    String roomNum,
+
+    String token
 ) {
 }

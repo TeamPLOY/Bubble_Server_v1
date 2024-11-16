@@ -7,6 +7,9 @@ import com.laundering.laundering_server.domain.member.model.dto.response.UserRes
 import com.laundering.laundering_server.domain.member.model.entity.Users;
 import com.laundering.laundering_server.domain.member.model.vo.WashingRoom;
 import com.laundering.laundering_server.domain.member.repository.UsersRepository;
+import com.laundering.laundering_server.domain.notification.model.entity.NotifiReservation;
+import com.laundering.laundering_server.domain.notification.model.entity.Notification;
+import com.laundering.laundering_server.domain.notification.repository.NotifiReservationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
@@ -21,6 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UsersRepository usersRepository;
+    private final NotifiReservationRepository notifiReservationRepository;
 
     @Transactional
     public void create(SignUpRequest req) {
@@ -38,13 +42,19 @@ public class UserService {
             // Enum을 이용해 washingRoom 값 결정
             String washingRoom = WashingRoom.findWashingRoom(prefix, roomNumber);
 
-            usersRepository.save(Users.builder()
+            Users user = usersRepository.save(Users.builder()
                     .email(req.email()) // 사용자 아이디
                     .password(new BCryptPasswordEncoder().encode(req.password())) // 비밀번호
                     .name(req.name())
                     .stuNum(req.stuNum()) // 아이 아이디
                     .roomNum(req.roomNum()) // roomNum 저장
                     .washingRoom(washingRoom) // 계산된 washingRoom 저장
+                    .build()
+            );
+
+            notifiReservationRepository.save(NotifiReservation.builder()
+                    .userId(user.getId())
+                    .token(req.token())
                     .build()
             );
         } catch (Exception e) {
