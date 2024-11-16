@@ -17,10 +17,4 @@ public class NotifiReservation {
     private Long userId;
 
     private String token;
-
-    private String machine;
-
-    @Builder.Default
-    @Column(nullable = false)
-    private boolean sent = false; // 알림 전송 여부 (기본값 false)
 }
