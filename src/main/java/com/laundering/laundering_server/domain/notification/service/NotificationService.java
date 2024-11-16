@@ -74,12 +74,14 @@ public class NotificationService
                     String dayOfWeekStr = dayOfWeek.getDisplayName(TextStyle.FULL, Locale.KOREAN); // 요일을 한글로 반환
 
                     return new ReservationLogResponse(
-                            log.getDate(),       // LocalDate를 String으로 변환
-                            log.isCancel(),      // 취소 여부 전달
+                            log.getDate(),         // LocalDate를 String으로 변환
+                            log.isCancel(),        // 취소 여부 전달
                             user.getWashingRoom(), // 사용자의 washingRoom 추가
-                            dayOfWeekStr        // 요일 정보 추가
+                            dayOfWeekStr,          // 요일 정보 추가
+                            log.getMachine()       // 추가된 machine 정보
                     );
                 })
                 .collect(Collectors.toList());
     }
+
 }

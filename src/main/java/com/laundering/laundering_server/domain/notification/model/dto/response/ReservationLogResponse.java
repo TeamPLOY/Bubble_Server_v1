@@ -6,7 +6,8 @@ public record ReservationLogResponse(
         LocalDate date,
         boolean cancel,
         String washingRoom,
-        String dayOfWeek
+        String dayOfWeek,
+        String machine
 
 ) {
 }
