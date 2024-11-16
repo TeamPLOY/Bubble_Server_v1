@@ -129,15 +129,20 @@ public class ReservationService {
         // 월요일부터 목요일에 대해서만 세탁기 예약 상태를 배열로 설정
         List<ReservationSummaryResponse> summaryList = allWeekdays.stream()
                 .map(date -> {
-                    // 기본적으로 예약이 없는 세탁기 배열 (예시로 세탁기 1, 2, 3, 4 존재)
                     boolean[] washingMachinesReserved = new boolean[4]; // 4개의 세탁기 (index 0: 세탁기1, index 1: 세탁기2, ...)
 
-                    Set<Integer> reservedMachines = reservationMap.getOrDefault(date, Collections.emptySet());
+                    // 오늘 이전 날짜들은 모두 예약된 상태로 설정 (true)
+                    if (date.isBefore(now.toLocalDate())) {
+                        Arrays.fill(washingMachinesReserved, true); // 이전 날짜들은 모두 예약된 상태
+                    } else {
+                        // 그 외의 경우는 기존 예약 데이터에 따라 상태 설정
+                        Set<Integer> reservedMachines = reservationMap.getOrDefault(date, Collections.emptySet());
 
-                    // 예약된 세탁기 번호를 true로 설정
-                    for (Integer machineId : reservedMachines) {
-                        if (machineId >= 1 && machineId <= 4) {
-                            washingMachinesReserved[machineId - 1] = true;
+                        // 예약된 세탁기 번호를 true로 설정
+                        for (Integer machineId : reservedMachines) {
+                            if (machineId >= 1 && machineId <= 4) {
+                                washingMachinesReserved[machineId - 1] = true;
+                            }
                         }
                     }
 
@@ -151,6 +156,7 @@ public class ReservationService {
 
         return summaryList;
     }
+
 
     // 세탁기 이름에서 ID 추출
     private Integer extractMachineId(Reservation reservation) {
