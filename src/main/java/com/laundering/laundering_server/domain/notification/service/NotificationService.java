@@ -82,25 +82,4 @@ public class NotificationService
                 })
                 .collect(Collectors.toList());
     }
-
-    public void saveNotification(saveNotificationRequest request, Long userId) {
-        // userId와 machine으로 NotifiReservation 조회
-        Optional<NotifiReservation> existingNotification = notifiReservationRepository.findByUserIdAndMachine(userId, request.machine());
-
-        // 기존 알림이 존재하면 삭제 후 함수 종료
-        if (existingNotification.isPresent()) {
-            notifiReservationRepository.delete(existingNotification.get());
-            return;  // 알림 삭제 후 함수 종료
-        }
-        
-        // 새로운 NotifiReservation 엔티티 생성
-        NotifiReservation notifiReservation = NotifiReservation.builder()
-                .userId(userId)
-                .machine(request.machine())
-                .token(request.token()) // 현재 날짜로 설정
-                .build();
-
-        // DB에 저장
-        notifiReservationRepository.save(notifiReservation);
-    }
 }

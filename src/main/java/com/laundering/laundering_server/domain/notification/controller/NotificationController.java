@@ -42,13 +42,4 @@ public class NotificationController {
         return ResponseEntity.ok(notificationFacade.getReservationHistory(getMemberId()));
 
     }
-
-    @Operation(summary = "알림 선택")
-    @PostMapping("/save")
-    public ResponseEntity<Void> saveNotification(
-            saveNotificationRequest saveNotificationRequest
-    ){
-        notificationFacade.saveNotification(saveNotificationRequest,getMemberId());
-        return ResponseEntity.noContent().build();
-    }
 }

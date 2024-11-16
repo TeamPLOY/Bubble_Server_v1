@@ -30,9 +30,4 @@ public class NotificationFacade {
     public List<ReservationLogResponse> getReservationHistory(Long id) {
         return notificationService.getReservationHistory(id);
     }
-
-    @Transactional
-    public void saveNotification(saveNotificationRequest request, Long id) {
-        notificationService.saveNotification(request,id);
-    }
 }
