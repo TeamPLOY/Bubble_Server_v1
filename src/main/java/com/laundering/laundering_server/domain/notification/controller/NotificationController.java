@@ -1,10 +1,11 @@
 package com.laundering.laundering_server.domain.notification.controller;
 
 import com.laundering.laundering_server.domain.facade.NotificationFacade;
+import com.laundering.laundering_server.domain.notification.model.dto.response.NotifiHistoryResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationDetailResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.ReservationLogResponse;
-import com.laundering.laundering_server.domain.notification.model.dto.request.saveNotificationRequest;
+import com.laundering.laundering_server.domain.notification.model.entity.NotifiHistory;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +42,11 @@ public class NotificationController {
     public ResponseEntity<List<ReservationLogResponse>> getReservationHistory() {
         return ResponseEntity.ok(notificationFacade.getReservationHistory(getMemberId()));
 
+    }
+
+    @Operation(summary = "알림 사용기록")
+    @GetMapping("/notification")
+    public ResponseEntity<List<NotifiHistoryResponse>> getNotificationHistory() {
+        return ResponseEntity.ok(notificationFacade.getNotificationHistory(getMemberId()));
     }
 }

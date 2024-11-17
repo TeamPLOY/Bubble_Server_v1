@@ -4,10 +4,13 @@ import com.laundering.laundering_server.common.exception.BusinessException;
 import com.laundering.laundering_server.common.exception.ErrorCode;
 import com.laundering.laundering_server.domain.member.model.entity.Users;
 import com.laundering.laundering_server.domain.member.repository.UsersRepository;
+import com.laundering.laundering_server.domain.notification.model.dto.response.NotifiHistoryResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationDetailResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.NotificationResponse;
 import com.laundering.laundering_server.domain.notification.model.dto.response.ReservationLogResponse;
+import com.laundering.laundering_server.domain.notification.model.entity.NotifiHistory;
 import com.laundering.laundering_server.domain.notification.model.entity.NotifiReservation;
+import com.laundering.laundering_server.domain.notification.repository.NotifiHistoryRepository;
 import com.laundering.laundering_server.domain.notification.repository.NotifiReservationRepository;
 import com.laundering.laundering_server.domain.notification.repository.NotificationRepository;
 import com.laundering.laundering_server.domain.washingMachine.model.entity.Reservation;
@@ -30,8 +33,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NotificationService
-{
+public class NotificationService {
     @Autowired
     private NotificationRepository notificationRepository;
 
@@ -39,7 +41,7 @@ public class NotificationService
     private ReservationRepository reservationRepository;
 
     @Autowired
-    private NotifiReservationRepository notifiReservationRepository;
+    private NotifiHistoryRepository notifiHistoryRepository;
 
     @Autowired
     private UsersRepository usersRepository;
@@ -49,6 +51,7 @@ public class NotificationService
                 .map(notification -> new NotificationResponse(notification.getTitle(), notification.getDate()))
                 .collect(Collectors.toList());
     }
+
     public List<NotificationDetailResponse> getNotificationDetail() {
         return notificationRepository.findAll().stream()
                 .map(notification -> new NotificationDetailResponse(
@@ -84,4 +87,20 @@ public class NotificationService
                 .collect(Collectors.toList());
     }
 
+    public List<NotifiHistoryResponse> getNotificationHistory(Long userId) {
+        // 사용자 이름 조회
+        Users user = usersRepository.findNameById(userId);
+
+        // 알림 기록 조회
+        List<NotifiHistory> historyList = notifiHistoryRepository.findByUserId(userId);
+
+        // NotifiHistoryResponse로 변환
+        return historyList.stream()
+                .map(history -> new NotifiHistoryResponse(
+                        user.getName(),
+                        history.getMachine(),
+                        history.getDate()
+                ))
+                .collect(Collectors.toList());
+    }
 }

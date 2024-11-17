@@ -3,7 +3,9 @@ package com.laundering.laundering_server.domain.washingMachine.service;
 import com.laundering.laundering_server.common.firebase.FirebaseService;
 import com.laundering.laundering_server.domain.member.model.entity.Users;
 import com.laundering.laundering_server.domain.member.repository.UsersRepository;
+import com.laundering.laundering_server.domain.notification.model.entity.NotifiHistory;
 import com.laundering.laundering_server.domain.notification.model.entity.NotifiReservation;
+import com.laundering.laundering_server.domain.notification.repository.NotifiHistoryRepository;
 import com.laundering.laundering_server.domain.notification.repository.NotifiReservationRepository;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.response.WashingMachineResponse;
 import com.laundering.laundering_server.domain.washingMachine.model.entity.Reservation;
@@ -26,6 +28,7 @@ public class WashingMachineStatusScheduler {
     private final ReservationRepository reservationRepository;
     private final FirebaseService firebaseService;
     private final UsersRepository usersRepository;
+    private final NotifiHistoryRepository notifiHistoryRepository;
 
     @Scheduled(fixedRate = 60000)
     public void updateWashingMachineStatus() {
@@ -40,7 +43,7 @@ public class WashingMachineStatusScheduler {
 
         // 3. 남은 시간이 0인 세탁기와 건조기 필터링
         List<WashingMachineResponse> machinesAboutToFinish = statusList.stream()
-                .filter(machine -> machine.time() == 0.0)
+                .filter(machine -> machine.time() == 1.0)
                 .collect(Collectors.toList());
 
         // 4. 각 상태별 알림 처리
@@ -53,6 +56,10 @@ public class WashingMachineStatusScheduler {
                 for (Reservation reservation : reservations) {
                     List<NotifiReservation> notifiReservations = notifiReservationRepository.findByUserId(reservation.getUserId());
                     for (NotifiReservation notifi : notifiReservations) {
+                        // 알림 기록 저장
+                        saveNotificationHistory(reservation.getUserId(), machineName);
+
+                        // FCM 알림 전송
                         firebaseService.sendFcmNotification(notifi.getToken(), machineName);
                     }
                 }
@@ -70,11 +77,25 @@ public class WashingMachineStatusScheduler {
 
                         // FCM 알림 전송
                         for (NotifiReservation notifi : notifiReservations) {
+                            // 알림 기록 저장
+                            saveNotificationHistory(reservation.getUserId(), machineName);
+
+                            // FCM 알림 전송
                             firebaseService.sendFcmNotification(notifi.getToken(), machineName);
                         }
                     }
                 }
             }
         }
+    }
+
+    // 알림 기록 저장 메서드
+    private void saveNotificationHistory(Long userId, String machineName) {
+        NotifiHistory history = NotifiHistory.builder()
+                .userId(userId)
+                .machine(machineName)
+                .date(LocalDate.now())
+                .build();
+        notifiHistoryRepository.save(history);
     }
 }
