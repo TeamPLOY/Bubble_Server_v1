@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -84,7 +85,8 @@ public class EmailService {
 
         try {
             // 템플릿 파일 읽기
-            String template = Files.readString(Paths.get("src/main/resources/templates/email-template.html"), StandardCharsets.UTF_8);
+            ClassPathResource resource = new ClassPathResource("templates/email-template.html");
+            String template = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             String htmlContent = template.replace("{{code}}", String.valueOf(code));
 
             // 이메일 메시지 작성
@@ -96,10 +98,11 @@ public class EmailService {
 
             // 이메일 전송
             Transport.send(message);
-        } catch (IOException | MessagingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
 
 
