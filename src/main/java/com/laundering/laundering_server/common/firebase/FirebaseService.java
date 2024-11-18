@@ -33,7 +33,7 @@ public class FirebaseService {
 
     // FCM 알림을 전송하는 메서드
     public void sendFcmNotification(String token, String machineName) {
-        String title = "버블 알림";
+        String title = "버블";
         String body = "세탁실 " + machineName + "가 곧 완료됩니다.";
 
         // FCM 요청 헤더 설정

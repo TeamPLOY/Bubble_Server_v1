@@ -14,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Properties;
@@ -62,43 +66,42 @@ public class EmailService {
         emailRepository.save(emailEntity); // 이메일 정보 데이터베이스에 저장
     }
 
-    /**
-     * 실제 이메일 전송 로직
-     *
-     * @param recipientEmail 수신자 이메일 주소
-     * @param code 전송할 인증 코드
-     */
     private void send(String recipientEmail, int code) {
-        // SMTP 서버 연결을 위한 속성 설정
+        // SMTP 서버 설정
         Properties properties = new Properties();
-        properties.put("mail.smtp.host", host); // SMTP 서버 호스트 설정
-        properties.put("mail.smtp.port", port); // SMTP 서버 포트 설정
-        properties.put("mail.smtp.starttls.enable", "true"); // STARTTLS 암호화 활성화
-        properties.put("mail.smtp.auth", "true"); // 인증 활성화
+        properties.put("mail.smtp.host", host);
+        properties.put("mail.smtp.port", port);
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.auth", "true");
 
         // 이메일 세션 생성
         Session session = Session.getInstance(properties, new jakarta.mail.Authenticator() {
             @Override
             protected jakarta.mail.PasswordAuthentication getPasswordAuthentication() {
-                return new jakarta.mail.PasswordAuthentication(senderEmail, senderPassword); // 인증 정보 설정
+                return new jakarta.mail.PasswordAuthentication(senderEmail, senderPassword);
             }
         });
 
         try {
+            // 템플릿 파일 읽기
+            String template = Files.readString(Paths.get("src/main/resources/templates/email-template.html"), StandardCharsets.UTF_8);
+            String htmlContent = template.replace("{{code}}", String.valueOf(code));
+
             // 이메일 메시지 작성
             MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(senderEmail)); // 발신자 주소 설정
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail)); // 수신자 주소 설정
-            message.setSubject("버블 회원가입 인증 메일"); // 이메일 제목 설정
-            message.setText("인증 코드 : " + code); // 이메일 본문 설정
+            message.setFrom(new InternetAddress(senderEmail));
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
+            message.setSubject("버블 회원가입 인증 메일");
+            message.setContent(htmlContent, "text/html; charset=utf-8");
 
             // 이메일 전송
-            Transport.send(message); // 이메일 전송
-
-        } catch (MessagingException e) {
-            e.printStackTrace(); // 예외 발생 시 스택 트레이스 출력
+            Transport.send(message);
+        } catch (IOException | MessagingException e) {
+            e.printStackTrace();
         }
     }
+
+
 
     public boolean certificationEmail(int code, String email) {
         // email로 가장 최근의 코드 조회
