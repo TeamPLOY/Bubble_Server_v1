@@ -15,12 +15,12 @@ import java.util.Date;
 
 public class Jwt {
     private final String issuer;
-    private final int tokenExpire;
-    private final int refreshTokenExpire;
+    private final Long tokenExpire;
+    private final Long refreshTokenExpire;
     private final Algorithm algorithm;
     private final JWTVerifier jwtVerifier;
 
-    public Jwt(String clientSecret, String issuer, int tokenExpire, int refreshTokenExpire) {
+    public Jwt(String clientSecret, String issuer, Long tokenExpire, Long refreshTokenExpire) {
         this.issuer = issuer;
         this.tokenExpire = tokenExpire;
         this.refreshTokenExpire = refreshTokenExpire;
@@ -42,7 +42,7 @@ public class Jwt {
         return new TokenResponse(generateAccessToken(claims), generateRefreshToken(claims));
     }
 
-    private String sign(Claims claims, int expireTime) {
+    private String sign(Claims claims, Long expireTime) {
         Date now = new Date(); // 현재 시간을 가져옵니다.
         return JWT.create()
                 .withIssuer(issuer)
