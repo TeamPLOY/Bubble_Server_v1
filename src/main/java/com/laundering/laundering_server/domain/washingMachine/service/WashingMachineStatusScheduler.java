@@ -18,9 +18,9 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
-@Slf4j
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class WashingMachineStatusScheduler {
 
     private final WashingMachineStatusService statusService;
@@ -30,8 +30,22 @@ public class WashingMachineStatusScheduler {
     private final UsersRepository usersRepository;
     private final NotifiHistoryRepository notifiHistoryRepository;
 
-    @Scheduled(fixedRate = 60000)
-    public void updateWashingMachineStatus() {
+    // 평일: 20시 ~ 익일 1시 (매 1분마다 실행)
+    @Scheduled(cron = "0 0-59 20-23 * * MON-FRI", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0-59 0 * * TUE-SAT", zone = "Asia/Seoul")
+    public void updateWashingMachineStatusWeekdays() {
+        executeTask();
+    }
+
+    // 일요일: 18시 ~ 익일 1시 (매 1분마다 실행)
+    @Scheduled(cron = "0 0-59 18-23 * * SUN", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0-59 0 * * MON", zone = "Asia/Seoul")
+    public void updateWashingMachineStatusSunday() {
+        executeTask();
+    }
+
+    // 실행 로직
+    private void executeTask() {
         log.info("모든 사용자의 세탁기 및 건조기 상태를 업데이트하는 중...");
 
         // 1. 세탁기 및 건조기 상태 가져오기
@@ -46,50 +60,48 @@ public class WashingMachineStatusScheduler {
                 .filter(machine -> machine.time() == 1.0)
                 .collect(Collectors.toList());
 
-        // 4. 각 상태별 알림 처리
-        for (WashingMachineResponse machine : machinesAboutToFinish) {
-            String machineName = machine.name();
+        // 4. 알림 처리
+        machinesAboutToFinish.forEach(this::handleNotification);
+    }
 
-            if (machineName.contains("세탁기")) {
-                // 세탁기 처리
-                List<Reservation> reservations = reservationRepository.findByDateAndMachineAndCancelFalse(LocalDate.now(), machineName);
-                for (Reservation reservation : reservations) {
-                    List<NotifiReservation> notifiReservations = notifiReservationRepository.findByUserId(reservation.getUserId());
-                    for (NotifiReservation notifi : notifiReservations) {
-                        // 알림 기록 저장
-                        saveNotificationHistory(reservation.getUserId(), machineName);
+    private void handleNotification(WashingMachineResponse machine) {
+        String machineName = machine.name();
 
-                        // FCM 알림 전송
-                        firebaseService.sendFcmNotification(notifi.getToken(), machineName);
-                    }
-                }
-            } else if (machineName.contains("건조기")) {
-                // 건조기 처리
-                List<Reservation> reservations = reservationRepository.findByDateAndCancelFalse(LocalDate.now());
-                for (Reservation reservation : reservations) {
-                    // Users 테이블을 통해 세탁실 정보를 가져옴
-                    Users user = usersRepository.findWashingRoomById(reservation.getUserId());
+        if (machineName.contains("세탁기")) {
+            handleWashingMachineNotifications(machineName);
+        } else if (machineName.contains("건조기")) {
+            handleDryerNotifications(machineName);
+        }
+    }
 
-                    // 건조기 이름의 앞 3자리와 세탁실 정보가 일치하는지 확인
-                    if (machineName.substring(0, 3).equals(user.getWashingRoom())) {
-                        // 사용자별 알림 예약 정보 조회
-                        List<NotifiReservation> notifiReservations = notifiReservationRepository.findByUserId(reservation.getUserId());
+    // 세탁기 알림 처리
+    private void handleWashingMachineNotifications(String machineName) {
+        List<Reservation> reservations = reservationRepository.findByDateAndMachineAndCancelFalse(LocalDate.now(), machineName);
+        for (Reservation reservation : reservations) {
+            List<NotifiReservation> notifiReservations = notifiReservationRepository.findByUserId(reservation.getUserId());
+            for (NotifiReservation notifi : notifiReservations) {
+                saveNotificationHistory(reservation.getUserId(), machineName);
+                firebaseService.sendFcmNotification(notifi.getToken(), machineName);
+            }
+        }
+    }
 
-                        // FCM 알림 전송
-                        for (NotifiReservation notifi : notifiReservations) {
-                            // 알림 기록 저장
-                            saveNotificationHistory(reservation.getUserId(), machineName);
-
-                            // FCM 알림 전송
-                            firebaseService.sendFcmNotification(notifi.getToken(), machineName);
-                        }
-                    }
+    // 건조기 알림 처리
+    private void handleDryerNotifications(String machineName) {
+        List<Reservation> reservations = reservationRepository.findByDateAndCancelFalse(LocalDate.now());
+        for (Reservation reservation : reservations) {
+            Users user = usersRepository.findWashingRoomById(reservation.getUserId());
+            if (machineName.substring(0, 3).equals(user.getWashingRoom())) {
+                List<NotifiReservation> notifiReservations = notifiReservationRepository.findByUserId(reservation.getUserId());
+                for (NotifiReservation notifi : notifiReservations) {
+                    saveNotificationHistory(reservation.getUserId(), machineName);
+                    firebaseService.sendFcmNotification(notifi.getToken(), machineName);
                 }
             }
         }
     }
 
-    // 알림 기록 저장 메서드
+    // 알림 기록 저장
     private void saveNotificationHistory(Long userId, String machineName) {
         NotifiHistory history = NotifiHistory.builder()
                 .userId(userId)

@@ -43,6 +43,5 @@ public class WashingMachineFacade {
     public boolean getIsReserved(Long id) {
         return reservationService.getIsReserved(id);
     }
-
 }
 

@@ -19,3 +19,15 @@ springdoc:
     disable-swagger-default-url: true
     display-request-duration: true
     operations-sorter: alpha
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,threaddump
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    enable:
+      http.server.requests: true

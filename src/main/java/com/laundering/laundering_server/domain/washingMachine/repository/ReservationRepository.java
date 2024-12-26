@@ -21,6 +21,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByDateAndMachineAndCancelFalse(LocalDate date, String machine);
 
-    // 날짜로 예약 조회 (isCancel = False)
     List<Reservation> findByDateAndCancelFalse(LocalDate date);
 }

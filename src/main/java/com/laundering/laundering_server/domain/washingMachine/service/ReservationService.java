@@ -6,6 +6,7 @@ import com.laundering.laundering_server.domain.member.model.entity.Users;
 import com.laundering.laundering_server.domain.member.repository.UsersRepository;
 import com.laundering.laundering_server.domain.notification.model.entity.NotifiReservation;
 import com.laundering.laundering_server.domain.notification.repository.NotifiReservationRepository;
+import com.laundering.laundering_server.domain.washingMachine.model.dto.response.ReservationListResponse;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.response.ReservationSummaryResponse;
 import com.laundering.laundering_server.domain.washingMachine.model.entity.Reservation;
 import com.laundering.laundering_server.domain.washingMachine.repository.ReservationRepository;
@@ -38,6 +39,8 @@ public class ReservationService {
 
     @Autowired
     private final NotifiReservationRepository notifiReservationRepository;
+
+    private static final List<String> MACHINES = List.of("세탁기1", "세탁기2", "세탁기3", "세탁기4");
 
     public void reservation(Long userId, LocalDate date, String machine) {
         // 사용자 조회

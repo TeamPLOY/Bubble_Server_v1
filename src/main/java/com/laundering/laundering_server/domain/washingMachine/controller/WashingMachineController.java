@@ -5,6 +5,7 @@ import com.laundering.laundering_server.domain.facade.WashingMachineFacade;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.request.ReservationRequest;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.response.ReservationSummaryResponse;
 import com.laundering.laundering_server.domain.washingMachine.model.dto.response.WashingMachineResponse;
+import com.laundering.laundering_server.domain.washingMachine.service.WashingMachineStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,19 @@ import static com.laundering.laundering_server.common.util.AuthenticationUtil.ge
 @RequiredArgsConstructor
 public class WashingMachineController {
     private final WashingMachineFacade washingMachineFacade;
+    private final WashingMachineStatusService washingMachineStatusService;
 
     @Operation(summary = "세탁기 시간 조회")
     @GetMapping("/washing")
     public ResponseEntity<List<WashingMachineResponse>> getStatus() {
         List<WashingMachineResponse> ws = washingMachineFacade.getStatus(getMemberId());
+        return ResponseEntity.ok(ws);
+    }
+
+    @Operation(summary = "기존 응답 시간 조회")
+    @GetMapping("/wash")
+    public ResponseEntity<List<WashingMachineResponse>> getOriginStatus() {
+        List<WashingMachineResponse> ws = washingMachineStatusService.getStatus();
         return ResponseEntity.ok(ws);
     }
 
