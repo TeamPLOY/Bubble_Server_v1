@@ -18,7 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FirebaseService {
 
-    private final String serviceAccountKeyFile = "/Users/hantaeyeongmac/bubble-457b0-firebase-adminsdk-a39g3-34a394f7a4.json"; // 서비스 계정 키 파일 경로
+    private final String serviceAccountKeyFile = "/home/ubuntu/bubble-457b0-firebase-adminsdk-a39g3-34a394f7a4.json"; // 서비스 계정 키 파일 경로
 
     // 액세스 토큰을 발급받는 메서드
     public String getAccessToken() throws IOException {
